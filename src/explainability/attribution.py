@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 from captum.attr import LayerIntegratedGradients
+from underthesea import word_tokenize as vn_word_tokenize
 
 class AttributionExplainer:
     """
@@ -21,12 +22,15 @@ class AttributionExplainer:
         return torch.softmax(logits, dim=1)
 
     def explain(self, text, target_label, n_steps=50):
+        # B1: Lấy attribution ở mức âm tiết (như bình thường)
         encoding = self.tokenizer(
             text, max_length=self.max_length, truncation=True,
-            padding='max_length', return_tensors='pt'
+            padding='max_length', return_tensors='pt',
+            return_offsets_mapping=True  
         )
         input_ids = encoding['input_ids'].to(self.device)
         attention_mask = encoding['attention_mask'].to(self.device)
+        offsets = encoding['offset_mapping'][0].tolist()  # [(start,end), ...] trong text gốc
 
         baseline_ids = torch.full_like(input_ids, self.tokenizer.pad_token_id)
 
@@ -36,80 +40,109 @@ class AttributionExplainer:
             pred_prob = probs[0, pred_label].item()
 
         attributions, delta = self.lig.attribute(
-            inputs=input_ids,
-            baselines=baseline_ids,
+            inputs=input_ids, baselines=baseline_ids,
             additional_forward_args=(attention_mask,),
-            target=target_label,
-            return_convergence_delta=True,
-            n_steps=n_steps
+            target=target_label, return_convergence_delta=True, n_steps=n_steps
         )
-
         attributions = attributions.sum(dim=-1).squeeze(0)
         attributions = attributions / (torch.norm(attributions) + 1e-10)
+        syllable_scores = attributions.cpu().detach().numpy()
 
-        ids = input_ids[0].cpu().tolist()
-        scores = attributions.cpu().detach().numpy()
+        # B2: Tách TỪ THẬT bằng underthesea (gộp âm tiết thành từ ghép)
+        vn_words = vn_word_tokenize(text)  # ví dụ: ['Samsung', 'đang', 'gặp', 'khó khăn', ...]
 
-        words, agg_scores = self._decode_and_aggregate(ids, scores)
+        # B3: Map mỗi từ ghép -> khoảng vị trí ký tự trong text gốc
+        word_spans = []
+        cursor = 0
+        for w in vn_words:
+            start = text.find(w, cursor)
+            if start == -1:
+                continue
+            end = start + len(w)
+            word_spans.append((w, start, end))
+            cursor = end
+
+        # B4: Gộp attribution của các syllable-token rơi vào khoảng của từng từ ghép
+        word_results = []
+        for word, w_start, w_end in word_spans:
+            scores_in_span = [
+                syllable_scores[i] for i, (s, e) in enumerate(offsets)
+                if s < w_end and e > w_start and not (s == 0 and e == 0)  # bỏ special tokens (offset=(0,0))
+            ]
+            if scores_in_span:
+                word_results.append((word, float(np.mean(scores_in_span))))
+
+        words = [w for w, s in word_results]
+        scores = np.array([s for w, s in word_results])
 
         return {
             'tokens': words,
-            'scores': agg_scores,
+            'scores': scores,
             'predicted_label': pred_label,
             'pred_prob': pred_prob,
             'convergence_delta': delta.item()
         }
 
-    def _decode_and_aggregate(self, ids, scores):
+    def _decode_subword_tokens(self, subword_tokens):
         """
-        Gộp token ids thành từ tiếng Việt thật, dựa vào 'Ġ' (byte-level BPE)
-        đánh dấu điểm BẮT ĐẦU của 1 từ mới. Dùng tokenizer.decode() để
-        tự động xử lý byte-level mapping ngược lại đúng UTF-8.
+        Convert BPE tokens to Vietnamese
         """
-        special_ids = set(self.tokenizer.all_special_ids)
+        decoded = []
+        for token in subword_tokens:
+            if token in ['[CLS]', '[SEP]', '[PAD]', '<s>', '</s>', '<pad>']:
+                continue  
+            
+            if token.startswith('##'):
+                token = token[2:]
+            
+            decoded.append(token)
+        
+        return decoded
 
-        # Nhóm các id liên tiếp thành từng "cụm từ" dựa vào marker Ġ
-        groups = []          # list[list[int]]
-        current_group = []
-
-        for tok_id in ids:
-            if tok_id in special_ids:
-                continue  # Bỏ [CLS], [SEP], [PAD]
-
-            piece = self.tokenizer.convert_ids_to_tokens([tok_id])[0]
-            starts_new_word = piece.startswith('Ġ') or piece.startswith('▁')
-
-            if starts_new_word and current_group:
-                groups.append(current_group)
-                current_group = [tok_id]
+    def _aggregate_scores(self, subword_tokens, scores):
+        """
+        Aggregate tokens to one word
+        """
+        
+        aggregated = []
+        current_word = ''
+        current_scores = []
+        
+        for token, score in zip(subword_tokens, scores):
+            if token in ['[CLS]', '[SEP]', '[PAD]', '<s>', '</s>', '<pad>']:
+                continue
+            
+            if token.startswith('##'):
+                current_word += token[2:]
+                current_scores.append(score)
             else:
-                current_group.append(tok_id)
+                if current_word:
+                    aggregated.append((current_word, np.mean(current_scores)))
 
-        if current_group:
-            groups.append(current_group)
+                current_word = token
+                current_scores = [score]
 
-        # Decode từng nhóm id → từ tiếng Việt thật (dùng chính tokenizer.decode)
-        words = []
-        id_to_pos = {tok_id: i for i, tok_id in enumerate(ids)}  # map ngược để lấy score
+        if current_word:
+            aggregated.append((current_word, np.mean(current_scores)))
 
-        agg_scores = []
-        pos = 0
-        for group in groups:
-            word = self.tokenizer.decode(group).strip()
-            words.append(word if word else '<?>')
+        words = [w for w, s in aggregated]
+        agg_scores = np.array([s for w, s in aggregated])
+        
+        return agg_scores
 
-            # Trung bình attribution score của các sub-token trong nhóm
-            group_len = len(group)
-            group_scores = scores[pos:pos + group_len]
-            agg_scores.append(float(np.mean(group_scores)))
-            pos += group_len
-
-        return words, np.array(agg_scores)
-
-    def top_tokens(self, result, k=15):
+    def top_tokens(self, result, k=15, dedupe='sum'):
         tokens, scores = result['tokens'], result['scores']
-        # Drop special tokens and padding
         valid = [(t, s) for t, s in zip(tokens, scores)
-                 if t not in ('<s>', '</s>', '<pad>', '[CLS]', '[SEP]', '[PAD]')]
+                 if t not in ('<s>', '</s>', '<pad>', '[CLS]', '[SEP]', '[PAD]', '<?>')]
+
+        if dedupe in ('sum', 'mean', 'max'):
+            agg, counts = {}, {}
+            for word, score in valid:
+                agg[word] = agg.get(word, 0) + score if dedupe in ('sum','mean') else max(agg.get(word, score), score)
+                counts[word] = counts.get(word, 0) + 1
+            if dedupe == 'mean':
+                agg = {w: s / counts[w] for w, s in agg.items()}
+            valid = list(agg.items())
+
         valid.sort(key=lambda x: x[1], reverse=True)
         return valid[:k]

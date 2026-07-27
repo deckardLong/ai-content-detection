@@ -1,3 +1,4 @@
+import re
 import numpy as np
 import html as html_lib
 import matplotlib.pyplot as plt
@@ -6,6 +7,12 @@ from IPython.display import HTML, display
 
 GREEN = '#2ecc71'
 RED = '#e74c3c'
+
+PUNCT_RE = re.compile(r'^[\W_]+$')
+
+def filter_punct(words, scores):
+    keep = [(w, s) for w, s in zip(words, scores) if not PUNCT_RE.match(w)]
+    return zip(*keep) if keep else ([], [])
 
 def plot_token_attribution(words, scores, title="Token Attribution", top_k=20):
     """
