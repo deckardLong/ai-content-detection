@@ -14,12 +14,14 @@ def filter_punct(words, scores):
     keep = [(w, s) for w, s in zip(words, scores) if not PUNCT_RE.match(w)]
     return zip(*keep) if keep else ([], [])
 
-def plot_token_attribution(words, scores, title="Token Attribution", top_k=20):
+def plot_token_attribution(words, scores, title="Token Attribution", top_k=20, target_label=1, save_path=None):
     """
     words: list of decoded Vietnamese words 
     scores: attribution scores 
     """
-    
+    target_name = 'AI' if target_label == 1 else 'Human'
+    other_name = 'Human' if target_label == 1 else 'AI'
+
     if isinstance(words, list) and isinstance(scores, np.ndarray):
         valid = [(w, s) for w, s in zip(words, scores) if w]  # Drop empty strings
     else:
@@ -46,17 +48,21 @@ def plot_token_attribution(words, scores, title="Token Attribution", top_k=20):
     ax.set_title(title, fontsize=12, fontweight='bold')
     
     legend_elements = [
-        Patch(facecolor=GREEN, label='Pushes towards AI'),
-        Patch(facecolor=RED, label='Pushes towards Human')
+        Patch(facecolor=GREEN, label=f'Pushes towards {target_name}'),
+        Patch(facecolor=RED, label=f'Pushes towards {other_name}')
     ]
     ax.legend(handles=legend_elements, loc='lower right')
     
     plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path)
+
     plt.show()
     plt.close(fig)
 
 def plot_top_tokens_by_type(top_tokens_per_type, target_label_map=None,
-                             suptitle='So sánh Top Attribution Tokens theo loại'):
+                             suptitle='So sánh Top Attribution Tokens theo loại', save_path=None):
     if target_label_map is None:
         target_label_map = {'human': 0, 'rewrited': 1, 'generated': 1}
 
@@ -81,14 +87,21 @@ def plot_top_tokens_by_type(top_tokens_per_type, target_label_map=None,
 
     plt.suptitle(suptitle, fontsize=14, fontweight='bold')
     plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path)
+
     plt.show()
     plt.close(fig)
 
 def highlight_text(words, scores, title="Attribution Highlight",
-                    pred_label=None, pred_prob=None, true_label=None):
+                    pred_label=None, pred_prob=None, true_label=None, target_label=1):
     if len(words) == 0:
         print("No words to highlight")
         return
+
+    target_name = 'AI' if target_label == 1 else 'Human'
+    other_name = 'Human' if target_label == 1 else 'AI'
  
     scores = np.array(scores)
     max_abs = np.max(np.abs(scores)) if np.max(np.abs(scores)) > 0 else 1.0
@@ -121,8 +134,8 @@ def highlight_text(words, scores, title="Attribution Highlight",
  
     legend = (
         '<div style="margin-top:8px; font-size:12px;">'
-        '<span style="background-color:rgba(46,204,113,0.7); padding:2px 6px;">xanh</span> = đẩy về phía AI &nbsp;&nbsp;'
-        '<span style="background-color:rgba(231,76,60,0.7); padding:2px 6px;">đỏ</span> = đẩy về phía Human'
+        f'<span style="background-color:rgba(46,204,113,0.7); padding:2px 6px;">xanh</span> = đẩy về phía {target_name} &nbsp;&nbsp;'
+        f'<span style="background-color:rgba(231,76,60,0.7); padding:2px 6px;">đỏ</span> = đẩy về phía {other_name}'
         '</div>'
     )
  

@@ -67,7 +67,7 @@ class AttributionExplainer:
         for word, w_start, w_end in word_spans:
             scores_in_span = [
                 syllable_scores[i] for i, (s, e) in enumerate(offsets)
-                if s < w_end and e > w_start and not (s == 0 and e == 0)  # bỏ special tokens (offset=(0,0))
+                if s < w_end and e > w_start and not (s == 0 and e == 0)  # Drop special tokens
             ]
             if scores_in_span:
                 word_results.append((word, float(np.mean(scores_in_span))))
