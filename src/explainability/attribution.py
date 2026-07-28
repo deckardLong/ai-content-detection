@@ -19,7 +19,7 @@ class AttributionExplainer:
 
     def _forward_func(self, input_ids, attention_mask):
         logits = self.model(input_ids, attention_mask)
-        return torch.softmax(logits, dim=1)
+        return logits
 
     def explain(self, text, target_label, n_steps=50):
         # B1: Lấy attribution ở mức âm tiết (như bình thường)
@@ -35,7 +35,8 @@ class AttributionExplainer:
         baseline_ids = torch.full_like(input_ids, self.tokenizer.pad_token_id)
 
         with torch.no_grad():
-            probs = self._forward_func(input_ids, attention_mask)
+            logits = self._forward_func(input_ids, attention_mask)
+            probs = torch.softmax(logits, dim=1)
             pred_label = torch.argmax(probs, dim=1).item()
             pred_prob = probs[0, pred_label].item()
 
