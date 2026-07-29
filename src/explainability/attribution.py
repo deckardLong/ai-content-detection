@@ -22,15 +22,15 @@ class AttributionExplainer:
         return logits
 
     def explain(self, text, target_label, n_steps=50):
-        # B1: Lấy attribution ở mức âm tiết (như bình thường)
+        # Step 1: Get attribution at syllable level (as usual)
         encoding = self.tokenizer(
             text, max_length=self.max_length, truncation=True,
             padding='max_length', return_tensors='pt',
-            return_offsets_mapping=True  
+            return_offsets_mapping=True # return position of each token
         )
         input_ids = encoding['input_ids'].to(self.device)
         attention_mask = encoding['attention_mask'].to(self.device)
-        offsets = encoding['offset_mapping'][0].tolist()  # [(start,end), ...] trong text gốc
+        offsets = encoding['offset_mapping'][0].tolist()  # [(start,end), ...] from original text
 
         baseline_ids = torch.full_like(input_ids, self.tokenizer.pad_token_id)
 
@@ -46,29 +46,29 @@ class AttributionExplainer:
             target=target_label, return_convergence_delta=True, n_steps=n_steps
         )
         attributions = attributions.sum(dim=-1).squeeze(0)
-        attributions = attributions / (torch.norm(attributions) + 1e-10)
+        attributions = attributions / (torch.norm(attributions) + 1e-10) # keep in stable range
         syllable_scores = attributions.cpu().detach().numpy()
 
-        # B2: Tách TỪ THẬT bằng underthesea (gộp âm tiết thành từ ghép)
-        vn_words = vn_word_tokenize(text)  # ví dụ: ['Samsung', 'đang', 'gặp', 'khó khăn', ...]
+        # Step 2: Combine syllables into compound nouns
+        vn_words = vn_word_tokenize(text)  # for example: ['Samsung', 'đang', 'gặp', 'khó khăn', ...]
 
-        # B3: Map mỗi từ ghép -> khoảng vị trí ký tự trong text gốc
+        # Step 3: Map for each compound nouns -> positional range from original text
         word_spans = []
         cursor = 0
         for w in vn_words:
             start = text.find(w, cursor)
-            if start == -1:
+            if start == -1: # unnecessary, defensive programming
                 continue
             end = start + len(w)
             word_spans.append((w, start, end))
             cursor = end
 
-        # B4: Gộp attribution của các syllable-token rơi vào khoảng của từng từ ghép
+        # Step 4: Combine attribution of syllable-tokens to fall in range of each compound nouns
         word_results = []
         for word, w_start, w_end in word_spans:
             scores_in_span = [
                 syllable_scores[i] for i, (s, e) in enumerate(offsets)
-                if s < w_end and e > w_start and not (s == 0 and e == 0)  # Drop special tokens
+                if s < w_end and e > w_start and not (s == 0 and e == 0)  # drop special tokens
             ]
             if scores_in_span:
                 word_results.append((word, float(np.mean(scores_in_span))))
