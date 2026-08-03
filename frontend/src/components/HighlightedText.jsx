@@ -8,28 +8,30 @@ export default function HighlightedText({tokens, scores}) {
         rank[tokenIdx] = order;
     });
 
-    const HIGHLIGHT_FRACTION = 0.35; 
-    const highlightCount = Math.max(1, Math.round(n * HIGHLIGHT_FRACTION));
+    const MIN_OPACITY = 0.08; 
+    const MAX_OPACITY = 0.75; 
+    const POWER = 2;          
 
     return (
         <p className="highlighted-text">
         {tokens.map((token, i) => {
             const score = scores[i];
-            const isHighlighted = rank[i] < highlightCount;
-            let style = {};
+            const strength = n > 1 ? 1 - rank[i] / (n - 1) : 1;
+            const opacity = (MIN_OPACITY + (MAX_OPACITY - MIN_OPACITY) * strength ** POWER).toFixed(2);
 
-            if (isHighlighted) {
-            const strength = 1 - rank[i] / highlightCount; 
-            const opacity = (0.25 + 0.55 * strength).toFixed(2);
-            style.backgroundColor = score > 0
-                ? `rgba(220, 53, 69, ${opacity})`  
-                : `rgba(25, 135, 84, ${opacity})`; 
-            }
+            const backgroundColor = score > 0
+                ? `rgba(220, 53, 69, ${opacity})`  // đỏ: đẩy về phía nhãn dự đoán (AI)
+                : `rgba(25, 135, 84, ${opacity})`; // xanh: đẩy ngược lại (Human)
 
             return (
-            <span key={i} className="token" style={style} title={`score: ${score.toFixed(3)}`}>
-                {token}{' '}
-            </span>
+                <span
+                    key={i}
+                    className="token"
+                    style={{ backgroundColor }}
+                    title={`score: ${score.toFixed(3)}`}
+                >
+                    {token}{' '}
+                </span>
             );
         })}
         </p>
