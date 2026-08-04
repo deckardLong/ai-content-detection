@@ -60,10 +60,14 @@ models/best_model.pt (mount qua volume, không nằm trong image)
 <!-- TODO: Upload figures thống kê: confusion matrix, ROC curve, phân bố dữ liệu -->
 ![Accuracy by Generated Type](figures/evaluation/accuracy_by_generated_types.png)
 ![Confusion Matrix](figures/evaluation/confusion_matrix_test_set.png)
-![ROC Curve](figures/evaluation/roc_curve.png)
+<p align="center">
+  <img src="figures/evaluation/roc_curve.png" width="550">
+</p>
 
 <!-- TODO: Upload sơ đồ flow thu thập dữ liệu -->
-![Data Collection Flow](images/data_pipeline.png)
+<p align="center">
+  <img src="images/data_pipeline.png" width="550">
+</p>
 
 Pipeline: thu thập (người viết vs AI tạo) → làm sạch (`src/preprocessing/cleaner.py`) → tokenize → train (`notebooks/03`) → đánh giá (`notebooks/04`) → explainability (`notebooks/05`, `06`).
 
