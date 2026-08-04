@@ -11,7 +11,7 @@ router = APIRouter()
 def explain(req: TextRequest, service: ModelService = Depends(get_model_service)):
     try:
         pred = service.predict(req.text)
-        result = service.explain(pred['cleaned_text'], target_label=pred['predicted_label'])
+        result = service.explain(pred['cleaned_text'])
     except Exception:
         logger.exception('Explain failed')
         raise HTTPException(status_code=500, detail='Không thể giải thích văn bản này')

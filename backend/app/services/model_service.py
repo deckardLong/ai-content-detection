@@ -8,6 +8,8 @@ from ..core.config import Settings
 
 logger = logging.getLogger(__name__)
 
+AL_LABEL = 1
+
 class ModelService:
     def __init__(self, settings: Settings):
         self.settings = settings
@@ -42,11 +44,11 @@ class ModelService:
             max_length=self.settings.max_length, clean=True
         )
 
-    def explain(self, text, target_label):
+    def explain(self, text):
         if self.explainer is None:
             raise RuntimeError('Model chưa được load')
         result = self.explainer.explain(
-            text, target_label=target_label, n_steps=self.settings.ig_n_steps
+            text, target_label=AL_LABEL, n_steps=self.settings.ig_n_steps
         )
 
         return {
