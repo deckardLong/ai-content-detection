@@ -85,6 +85,7 @@ Pipeline: thu thập (người viết vs AI tạo) → làm sạch (`src/preproc
 <!-- TODO: Upload ảnh UI phần giải thích/highlight -->
 ![Explainability Result](images/explainability_result.png)
 
+![Explainability AI Result](images/explainability_by_ai_result.png)
 </details>
 
 <details>

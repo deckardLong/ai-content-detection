@@ -16,3 +16,4 @@ async function postJSON(path, body) {
 
 export const predictText = (text) => postJSON('/predict', {text})
 export const explainText = (text) => postJSON('/explain', {text})
+export const explainLlmText = (text) => postJSON('/explain-llm', { text });

@@ -4,7 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import settings
 from .services.model_service import ModelService
-from .routers import health, explain, predict
+from .services.gemini_service import GeminiExplanationService
+from .routers import health, explain, predict, explain_llm
 
 logging.basicConfig(level=logging.INFO)
 
@@ -13,6 +14,7 @@ async def lifespan(app: FastAPI):
     service = ModelService(settings)
     service.load() # load model 1 time when server starts
     app.state.model_service = service
+    app.state.gemini_service = GeminiExplanationService(settings)
     yield
 
     # No cleanup here
@@ -28,3 +30,4 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(predict.router)
 app.include_router(explain.router)
+app.include_router(explain_llm.router)

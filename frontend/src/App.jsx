@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { predictText, explainText } from './api';
+import { predictText, explainText, explainLlmText } from './api';
 import PredictionResult from './components/PredictionResult';
 import HighlightedText from './components/HighlightedText';
+import LlmExplanation from './components/LlmExplanation';
 
 export default function App() {
   const [text, setText] = useState('');
@@ -9,6 +10,8 @@ export default function App() {
   const [explanation, setExplanation] = useState(null);
   const [loadingPredict, setLoadingPredict] = useState(false);
   const [loadingExplain, setLoadingExplain] = useState(false);
+  const [llmExplanation, setLlmExplanation] = useState(null);
+  const [loadingLlm, setLoadingLlm] = useState(false);
   const [error, setError] = useState(null);
 
   async function handlePredict() {
@@ -37,6 +40,19 @@ export default function App() {
       setError('Không thể tạo giải thích cho văn bản này.');
     } finally {
       setLoadingExplain(false);
+    }
+  }
+
+  async function handleExplainLlm() {
+    setError(null);
+    setLoadingLlm(true);
+    try {
+      setLlmExplanation(await explainLlmText(text));
+    } catch (err) {
+      console.error('Explain-LLM error:', err);
+      setError('Không thể tạo giải thích AI. Có thể đã vượt giới hạn gọi Gemini.');
+    } finally {
+      setLoadingLlm(false);
     }
   }
 
@@ -74,6 +90,11 @@ export default function App() {
               {loadingExplain ? 'Đang tạo giải thích...' : 'Xem giải thích'}
             </button>
           )}
+          {prediction && (
+            <button className="btn-secondary" onClick={handleExplainLlm} disabled={loadingLlm}>
+              {loadingLlm ? 'Đang hỏi AI...' : 'Giải thích bằng AI'}
+            </button>
+          )}
         </div>
         {error && <p className="error-banner">{error}</p>}
       </div>
@@ -88,6 +109,13 @@ export default function App() {
             <span><span className="swatch" style={{ background: 'rgba(224,41,58,0.55)' }} />Ủng hộ AI</span>
             <span><span className="swatch" style={{ background: 'rgba(21,150,82,0.55)' }} />Ủng hộ con người</span>
           </div>
+        </div>
+      )}
+
+      {llmExplanation && (
+        <div className="panel">
+          <p className="section-label">Giải thích ngôn ngữ tự nhiên (Gemini)</p>
+          <LlmExplanation bullets={llmExplanation.bullets} cached={llmExplanation.cached} />
         </div>
       )}
     </div>

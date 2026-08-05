@@ -8,8 +8,12 @@ class Settings(BaseSettings):
     ig_n_steps: int = 25
     cors_origins: list[str] = ['http://localhost:5173', 'http://localhost:3000']
 
+    gemini_api_key: str = ''
+    gemini_model: str = 'gemini-2.5-flash'
+    gemini_rate_limit_per_minute: int = 10
+
     class Config:
         env_file = '.env'
-        env_prefix = 'APP_'
+        env_prefix = 'app_'
 
 settings = Settings()

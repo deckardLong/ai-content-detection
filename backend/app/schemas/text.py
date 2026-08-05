@@ -13,3 +13,7 @@ class ExplainResponse(BaseModel):
     scores: list[float]
     predicted_label: int
     pred_prob: float
+
+class ExplainLLMResponse(BaseModel):
+    bullets: list[str]
+    cached: bool
