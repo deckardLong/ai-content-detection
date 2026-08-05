@@ -83,12 +83,6 @@ curl -X POST http://localhost:8000/explain-llm \
 
 ![Architecture](images/architecture.png)
 
-### Luồng thu thập dữ liệu
-**Sơ đồ luồng thu thập dữ liệu**
-<p align="center">
-  <img src="images/data_pipeline.png" width="550">
-</p>
-
 ### Luồng xử lý
 **Giải thích via Gemini (natural language):**
 
@@ -107,6 +101,12 @@ Integrated Gradients (Captum) → attribution score/từ
     ↓ (nếu gọi /explain-llm)
 Tính feature signals → Gemini sinh bullet
 ```
+
+### Luồng thu thập dữ liệu
+**Sơ đồ luồng thu thập dữ liệu**
+<p align="center">
+  <img src="images/data_pipeline.png" width="550">
+</p>
 
 ### Model
 
