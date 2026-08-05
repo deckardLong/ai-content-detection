@@ -13,10 +13,10 @@ Phát hiện văn bản tiếng Việt do AI tạo ra — BamiBERT fine-tuned + 
 | F1-score | 0.93 | 0.93 |
 
 **Tính năng chính:**
-- ✅ Phân loại văn bản Human/AI (binary classification)
-- ✅ Attribution-based explainability (Integrated Gradients via Captum, highlight từ-theo-từ)
-- ✅ Giải thích ngôn ngữ tự nhiên (Gemini API, on-demand, grounded)
-- ✅ Giao diện thân thiện (gauge measurement UI, 4-tier color highlighting)
+- Phân loại văn bản Human/AI (binary classification)
+- Attribution-based explainability (Integrated Gradients via Captum, highlight từ-theo-từ)
+- Giải thích ngôn ngữ tự nhiên (Gemini API, on-demand, grounded)
+- Giao diện thân thiện (gauge measurement UI, 4-tier color highlighting)
 
 ## Chạy nhanh
 
