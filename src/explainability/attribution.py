@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 from captum.attr import LayerIntegratedGradients
+from captum.metrics import infidelity
 from underthesea import word_tokenize as vn_word_tokenize
 
 class AttributionExplainer:
@@ -82,6 +83,69 @@ class AttributionExplainer:
             'predicted_label': pred_label,
             'pred_prob': pred_prob,
             'convergence_delta': delta.item()
+        }
+
+    def _build_perturb_mask(self, inputs, attention_mask, perturb_ratio):
+        random_values = torch.rand_like(inputs, dtype=torch.float)
+        mask = (random_values < perturb_ratio).long()
+        mask = mask * attention_mask # only keep mask in a real token position
+
+        # Remove <CLS> and <SEP> tokens
+        mask[:, 0] = 0
+        seq_lengths = attention_mask.sum(dim=1) - 1
+        mask[torch.arange(mask.size(0)), seq_lengths] = 0
+        return mask
+
+    def evaluate_faithfulness(self, text, target_label, n_steps=15, perturb_ratio=0.2, n_perturb_samples=5):
+        encoding = self.tokenizer(
+            text, max_length=self.max_length, truncation=True,
+            padding='max_length', return_tensors='pt'
+        )
+        input_ids = encoding['input_ids'].to(self.device)
+        attention_mask = encoding['attention_mask'].to(self.device)
+        baseline_id = self.tokenizer.pad_token_id
+
+        attributions = self.lig.attribute(
+            inputs=input_ids, baselines=torch.full_like(input_ids, baseline_id),
+            additional_forward_args=(attention_mask,), target=target_label, n_steps=n_steps
+        )
+        attributions = attributions.sum(dim=-1)
+
+        def perturb_func_infidelity(inputs):
+            mask = self._build_perturb_mask(inputs, attention_mask, perturb_ratio)
+
+            perturbed = inputs * (1 - mask) + baseline_id * mask
+            pertubation = mask.float()
+            return pertubation, perturbed # which tokens have changed & changed inputs
+
+        infid = infidelity(
+            self._forward_func, perturb_func_infidelity, input_ids, attributions,
+            additional_forward_args=(attention_mask,), target=target_label,
+            n_perturb_samples=n_perturb_samples
+        )
+
+        original_attr_flat = attributions.view(-1)
+        original_norm = torch.norm(original_attr_flat) + 1e-10
+
+        max_sensitivity = 0.0
+
+        for _ in range(n_perturb_samples):
+            mask = self._build_perturb_mask(input_ids, attention_mask, perturb_ratio)
+            perturbed_input_ids = input_ids * (1 - mask) + baseline_id * mask
+
+            perturbed_attr = self.lig.attribute(
+                inputs=perturbed_input_ids, baselines=torch.full_like(perturbed_input_ids, baseline_id),
+                additional_forward_args=(attention_mask,), target=target_label, n_steps=n_steps
+            )
+            perturbed_attr = perturbed_attr.sum(dim=-1).view(-1)
+ 
+            diff_norm = torch.norm(original_attr_flat - perturbed_attr)
+            sensitivity = (diff_norm / original_norm).item()
+            max_sensitivity = max(max_sensitivity, sensitivity)
+        
+        return {
+            'infidelity': infid.item(),
+            'sensitivity_max': max_sensitivity
         }
 
     def _decode_subword_tokens(self, subword_tokens):
