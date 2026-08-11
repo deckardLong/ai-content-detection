@@ -30,4 +30,4 @@ def explain_llm(req: TextRequest,
     except Exception:
         logger.exception("explain-llm failed")
         raise HTTPException(status_code=500, detail="Không thể tạo giải thích AI")
-    return ExplainLLMResponse(**result)
+    return ExplainLLMResponse(**result, signals=signals)

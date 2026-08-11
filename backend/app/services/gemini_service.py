@@ -1,3 +1,4 @@
+import re
 import hashlib
 import logging
 import google.generativeai as genai
@@ -41,6 +42,24 @@ class GeminiExplanationService:
     def _cache_key(text):
         return hashlib.sha256(text.encode('utf-8')).hexdigest()
 
+    def _parse_bullets(self, text: str):
+        lines = [l.strip() for l in text.splitlines() if l.strip()]
+        bullet_lines = [l for l in lines if re.match(r'^[-*•]\s+', l)]
+
+        if len(bullet_lines) >= 2:
+            raw_bullets  = bullet_lines
+        else:
+            raw_bullets = re.split(r'(?:^|\s)[-*]\s+', text)
+
+        bullets = []
+        for b in raw_bullets:
+            b = re.sub(r'^[-*•]\s*', '', b)
+            b = re.sub(r'\*\*(.+?)\*\**', r'\1', b)
+            b = b.strip()
+            if b:
+                bullets.append(b)
+        return bullets if bullets else [text.strip()]
+
     def explain(self, cleaned_text, predicted_class, pred_prob, signals):
         if not self.enabled:
             raise RuntimeError('GEMINI_API_KEY chưa được cấu hình')
@@ -69,28 +88,12 @@ class GeminiExplanationService:
         try: 
             response = self.model_client.generate_content(prompt)
             text = response.text.strip()
-            bullets = []
-            for line in text.splitlines():
-                line = line.strip()
-                if line.startswith('* '):
-                    bullet = line[2:].strip() 
-                    bullet = bullet.lstrip('*').strip() 
-                    if bullet:
-                        bullets.append(bullet)
-
-            if not bullets:
-                bullets = [b.strip() for b in text.split('*') if b.strip()]
-
-            if not bullets:
-                bullets = [text]
+            bullets = self._parse_bullets(text)
         except Exception as e:
             logger.exception('Gemini call failed')
             logger.error(f'Lỗi Gemini API: {e}')
             raise RuntimeError('Không gọi được Gemini API')
 
-        bullets = [line.lstrip("- ").strip() for line in text.splitlines() if line.strip().startswith("-")]
-        if not bullets:
-            bullets = [text]
         self._cache[key] = bullets
         self._cache_order.append(key)
         if len(self._cache_order) > self._cache_max_size:

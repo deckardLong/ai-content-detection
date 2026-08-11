@@ -17,3 +17,4 @@ class ExplainResponse(BaseModel):
 class ExplainLLMResponse(BaseModel):
     bullets: list[str]
     cached: bool
+    signals: dict
