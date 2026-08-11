@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { predictText, explainText, explainLlmText } from './api';
+import { useAuth } from './contexts/AuthContext';
+import AuthForm from './components/AuthForm';
+import UserBar from './components/UserBar';
 import PredictionResult from './components/PredictionResult';
 import HighlightedText from './components/HighlightedText';
 import LlmExplanation from './components/LlmExplanation';
 
 export default function App() {
+  const { user, loading: authLoading } = useAuth();
   const [text, setText] = useState('');
   const [prediction, setPrediction] = useState(null);
   const [explanation, setExplanation] = useState(null);
@@ -14,11 +18,14 @@ export default function App() {
   const [loadingLlm, setLoadingLlm] = useState(false);
   const [error, setError] = useState(null);
 
+  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+
   async function handlePredict() {
     if (!text.trim()) return;
     setError(null);
     setPrediction(null);
     setExplanation(null);
+    setLlmExplanation(null);
     setLoadingPredict(true);
     try {
       setPrediction(await predictText(text));
@@ -56,6 +63,18 @@ export default function App() {
     }
   }
 
+  if (authLoading) {
+    return (
+      <div className="app-shell">
+        <p className="loading-text">Đang tải...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthForm />;
+  }
+
   return (
     <div className="app-shell">
       <div className="device-strip">
@@ -66,6 +85,8 @@ export default function App() {
         <span>·</span>
         <span>device: cpu</span>
       </div>
+
+      <UserBar />
 
       <div className="masthead">
         <p className="eyebrow">Phân tích bài báo IT tiếng Việt</p>
@@ -81,6 +102,9 @@ export default function App() {
           onChange={(e) => setText(e.target.value)}
           placeholder="Dán văn bản tiếng Việt cần kiểm tra vào đây..."
         />
+        <div className="textarea-footer">
+          <span className="word-count">{wordCount} từ</span>
+        </div>
         <div className="actions">
           <button className="btn-primary" onClick={handlePredict} disabled={loadingPredict || !text.trim()}>
             {loadingPredict ? 'Đang phân tích...' : 'Phân tích'}
