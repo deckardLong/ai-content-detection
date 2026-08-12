@@ -19,7 +19,7 @@ def _to_user_out(user: User):
     return UserOut(id=user.id, username=user.username, avatar_url=avatar_url)
 
 # Register
-@router.post('/register', response_model=Token)
+@router.post('/register', response_model=UserOut)
 def register(payload: UserCreate, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.username == payload.username).first()
 
@@ -30,8 +30,7 @@ def register(payload: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
 
-    token = create_access_token(user_id=user.id)
-    return Token(access_token=token, user=_to_user_out(user))
+    return _to_user_out(user)
 
 # Login
 @router.post('/login', response_model=Token)

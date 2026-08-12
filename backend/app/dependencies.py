@@ -7,6 +7,7 @@ from .core.security import decode_access_token
 from .models.user import User
 
 bearer_scheme = HTTPBearer() 
+bearer_scheme_optinal = HTTPBearer(auto_error=False)
 
 def get_model_service(request: Request):
     return request.app.state.model_service
@@ -23,3 +24,14 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Người dùng không tồn tại')
     return user
+
+def get_current_user_optional(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme_optinal), db: Session = Depends(get_db)):
+    """
+    Use for Script Eval
+    """
+    if credentials is None:
+        return None
+    user_id = decode_access_token(credentials.credentials)
+    if user_id is None:
+        return None
+    return db.query(User).filter(User.id == user_id).first()

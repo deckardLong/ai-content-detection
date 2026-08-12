@@ -24,13 +24,25 @@ async function getJSON(path, extraHeaders = {}) {
   return res.json();
 }
 
-export const predictText = (text) => postJSON('/predict', { text });
-export const explainText = (text) => postJSON('/explain', { text });
-export const explainLlmText = (text) => postJSON('/explain-llm', { text });
+export const predictText = (text) => postJSON('/predict', { text }, authHeaders());
+export const explainText = (text, historyId) => postJSON('/explain', { text, history_id: historyId }, authHeaders());
+export const explainLlmText = (text, historyId) => postJSON('/explain-llm', { text, history_id: historyId }, authHeaders());
 
 export const registerUser = (username, password) => postJSON('/auth/register', { username, password });
 export const loginUser = (username, password) => postJSON('/auth/login', { username, password });
 export const fetchCurrentUser = () => getJSON('/auth/me', authHeaders());
+
+export const fetchHistory = () => getJSON('/predictions', authHeaders());
+export const fetchHistoryItem = (id) => getJSON(`/predictions/${id}`, authHeaders());
+
+export async function deleteHistoryItem(id) {
+  const res = await fetch(`${API_BASE}/predictions/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error('Xóa thất bại');
+  return res.json();
+}
 
 export async function uploadAvatar(file) {
   const formData = new FormData();

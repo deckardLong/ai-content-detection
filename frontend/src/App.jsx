@@ -6,6 +6,7 @@ import UserBar from './components/UserBar';
 import PredictionResult from './components/PredictionResult';
 import HighlightedText from './components/HighlightedText';
 import LlmExplanation from './components/LlmExplanation';
+import HistorySidebar from './components/HistorySidebar';
 
 export default function App() {
   const { user, loading: authLoading } = useAuth();
@@ -16,9 +17,23 @@ export default function App() {
   const [loadingExplain, setLoadingExplain] = useState(false);
   const [llmExplanation, setLlmExplanation] = useState(null);
   const [loadingLlm, setLoadingLlm] = useState(false);
+  const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
   const [error, setError] = useState(null);
+  const [historyId, setHistoryId] = useState(null);
 
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+
+  function handleSelectHistory(detail) {
+    setText(detail.text);
+    setPrediction({
+      predicted_class: detail.predicted_class,
+      prob_ai: detail.prob_ai,
+      prob_human: 1 - detail.prob_ai,
+    });
+    setExplanation(null);
+    setLlmExplanation(null);
+    setError(null);
+  }
 
   async function handlePredict() {
     if (!text.trim()) return;
@@ -28,7 +43,10 @@ export default function App() {
     setLlmExplanation(null);
     setLoadingPredict(true);
     try {
-      setPrediction(await predictText(text));
+      const result = await predictText(text);
+      setPrediction(result);
+      setHistoryId(result.historyId || null);
+      setHistoryRefreshKey((k) => k + 1);
     } catch (err) {
       console.error('Predict error:', err);
       setError('Không thể phân tích văn bản. Kiểm tra backend đã chạy chưa.');
@@ -41,7 +59,8 @@ export default function App() {
     setError(null);
     setLoadingExplain(true);
     try {
-      setExplanation(await explainText(text));
+      setExplanation(await explainText(text, historyId));
+      setHistoryRefreshKey((k) => k + 1);
     } catch (err) {
       console.error('Explain error:', err);
       setError('Không thể tạo giải thích cho văn bản này.');
@@ -54,13 +73,27 @@ export default function App() {
     setError(null);
     setLoadingLlm(true);
     try {
-      setLlmExplanation(await explainLlmText(text));
+      setLlmExplanation(await explainLlmText(text, historyId));
+      setHistoryRefreshKey((k) => k + 1);
     } catch (err) {
       console.error('Explain-LLM error:', err);
       setError('Không thể tạo giải thích AI. Có thể đã vượt giới hạn gọi Gemini.');
     } finally {
       setLoadingLlm(false);
     }
+  }
+  
+  function handleSelectHistory(detail) {
+    setText(detail.text);
+    setHistoryId(detail.id);
+    setPrediction({
+      predicted_class: detail.predicted_class,
+      prob_ai: detail.prob_ai,
+      prob_human: 1 - detail.prob_ai,
+    });
+    setExplanation(detail.explain_result || null);
+    setLlmExplanation(detail.llm_result ? { bullets: detail.llm_result.bullets, cached: true } : null);
+    setError(null);
   }
 
   if (authLoading) {
@@ -76,72 +109,75 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
-      <div className="device-strip">
-        <span className="dot" />
-        <span>VĂN.DETECT</span>
-        <span className="spacer" />
-        <span>model: bamibert</span>
-        <span>·</span>
-        <span>device: cpu</span>
-      </div>
-
-      <UserBar />
-
-      <div className="masthead">
-        <p className="eyebrow">Phân tích bài báo IT tiếng Việt</p>
-        <h1>Vietnamese AI IT News Detector</h1>
-        <p>Dán văn bản vào bên dưới để đo khả năng được tạo bởi AI.</p>
-      </div>
-
-      <div className="panel">
-        <p className="section-label">Văn bản đầu vào</p>
-        <textarea
-          rows={8}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Dán văn bản tiếng Việt cần kiểm tra vào đây..."
-        />
-        <div className="textarea-footer">
-          <span className="word-count">{wordCount} từ</span>
+    <div className='layout'>
+      <HistorySidebar onSelect={handleSelectHistory} refreshKey={historyRefreshKey} />
+      <div className="app-shell">
+        <div className="device-strip">
+          <span className="dot" />
+          <span>VĂN.DETECT</span>
+          <span className="spacer" />
+          <span>model: bamibert</span>
+          <span>·</span>
+          <span>device: cpu</span>
         </div>
-        <div className="actions">
-          <button className="btn-primary" onClick={handlePredict} disabled={loadingPredict || !text.trim()}>
-            {loadingPredict ? 'Đang phân tích...' : 'Phân tích'}
-          </button>
-          {prediction && (
-            <button className="btn-secondary" onClick={handleExplain} disabled={loadingExplain}>
-              {loadingExplain ? 'Đang tạo giải thích...' : 'Xem giải thích'}
-            </button>
-          )}
-          {prediction && (
-            <button className="btn-secondary" onClick={handleExplainLlm} disabled={loadingLlm}>
-              {loadingLlm ? 'Đang hỏi AI...' : 'Giải thích bằng AI'}
-            </button>
-          )}
+
+        <UserBar />
+
+        <div className="masthead">
+          <p className="eyebrow">Phân tích bài báo IT tiếng Việt</p>
+          <h1>Vietnamese AI IT News Detector</h1>
+          <p>Dán văn bản vào bên dưới để đo khả năng được tạo bởi AI.</p>
         </div>
-        {error && <p className="error-banner">{error}</p>}
-      </div>
 
-      {prediction && <PredictionResult prediction={prediction} />}
-
-      {explanation && (
         <div className="panel">
-          <p className="section-label">Bằng chứng phân tích</p>
-          <HighlightedText tokens={explanation.tokens} scores={explanation.scores} />
-          <div className="legend">
-            <span><span className="swatch" style={{ background: 'rgba(224,41,58,0.55)' }} />Ủng hộ AI</span>
-            <span><span className="swatch" style={{ background: 'rgba(21,150,82,0.55)' }} />Ủng hộ con người</span>
+          <p className="section-label">Văn bản đầu vào</p>
+          <textarea
+            rows={8}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Dán văn bản tiếng Việt cần kiểm tra vào đây..."
+          />
+          <div className="textarea-footer">
+            <span className="word-count">{wordCount} từ</span>
           </div>
+          <div className="actions">
+            <button className="btn-primary" onClick={handlePredict} disabled={loadingPredict || !text.trim()}>
+              {loadingPredict ? 'Đang phân tích...' : 'Phân tích'}
+            </button>
+            {prediction && (
+              <button className="btn-secondary" onClick={handleExplain} disabled={loadingExplain}>
+                {loadingExplain ? 'Đang tạo giải thích...' : 'Xem giải thích'}
+              </button>
+            )}
+            {prediction && (
+              <button className="btn-secondary" onClick={handleExplainLlm} disabled={loadingLlm}>
+                {loadingLlm ? 'Đang hỏi AI...' : 'Giải thích bằng AI'}
+              </button>
+            )}
+          </div>
+          {error && <p className="error-banner">{error}</p>}
         </div>
-      )}
 
-      {llmExplanation && (
-        <div className="panel">
-          <p className="section-label">Giải thích ngôn ngữ tự nhiên (Gemini)</p>
-          <LlmExplanation bullets={llmExplanation.bullets} cached={llmExplanation.cached} />
-        </div>
-      )}
+        {prediction && <PredictionResult prediction={prediction} />}
+
+        {explanation && (
+          <div className="panel">
+            <p className="section-label">Bằng chứng phân tích</p>
+            <HighlightedText tokens={explanation.tokens} scores={explanation.scores} />
+            <div className="legend">
+              <span><span className="swatch" style={{ background: 'rgba(224,41,58,0.55)' }} />Ủng hộ AI</span>
+              <span><span className="swatch" style={{ background: 'rgba(21,150,82,0.55)' }} />Ủng hộ con người</span>
+            </div>
+          </div>
+        )}
+
+        {llmExplanation && (
+          <div className="panel">
+            <p className="section-label">Giải thích ngôn ngữ tự nhiên (Gemini)</p>
+            <LlmExplanation bullets={llmExplanation.bullets} cached={llmExplanation.cached} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

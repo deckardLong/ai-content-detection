@@ -12,6 +12,8 @@ def evaluate_one(sample: dict):
         llm = call_explain_llm(text)
         print(llm.get("signals", {}))
         groundedness = score_groundedness(llm["bullets"], llm.get("signals", {}))
+        words_ratio = groundedness["known_words_referenced"] / max(groundedness["known_words_total"], 1)
+        numeric_ratio = groundedness['numeric_claims_matched'] / 3 
         return {
             "id": sample["id"],
             "generated_type_true": sample["generated_type"],
@@ -20,9 +22,10 @@ def evaluate_one(sample: dict):
             "bullets": " | ".join(llm["bullets"]),
             "known_words_referenced": groundedness["known_words_referenced"],
             "known_words_total": groundedness["known_words_total"],
+            "words_ratio": round(words_ratio, 2),
             "numeric_claims_matched": groundedness["numeric_claims_matched"],
+            "numeric_ratio": round(numeric_ratio, 2),
             "status": "ok",
-            "example_note": "",
         }
     except Exception as e:
         return {
@@ -33,9 +36,10 @@ def evaluate_one(sample: dict):
             "bullets": "", 
             "known_words_referenced": "", 
             "known_words_total": "",
+             "words_ratio": "",
             "numeric_claims_matched": "", 
             "status": f"error: {e}", 
-            "example_note": "",
+            "numeric_ratio": "",
         }
 
 def main():

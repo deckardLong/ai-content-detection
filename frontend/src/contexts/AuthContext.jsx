@@ -26,9 +26,7 @@ export function AuthProvider({ children }) {
   }
 
   async function register(username, password) {
-    const data = await registerUser(username, password);
-    localStorage.setItem('access_token', data.access_token);
-    setUser(data.user);
+    await registerUser(username, password);
   }
 
   function logout() {

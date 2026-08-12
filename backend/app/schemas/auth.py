@@ -12,7 +12,7 @@ class UserLogin(BaseModel):
 
 # User Out
 class UserOut(BaseModel):
-    id: int
+    id: str
     username: str
     avatar_url: str | None = None
 

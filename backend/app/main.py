@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .core.config import settings
 from .services.model_service import ModelService
 from .services.gemini_service import GeminiExplanationService
-from .routers import health, explain, predict, explain_llm, auth
+from .routers import health, explain, predict, explain_llm, auth, history
 from .core.database import Base, engine
 
 logging.basicConfig(level=logging.INFO)
@@ -38,5 +38,6 @@ app.include_router(predict.router)
 app.include_router(explain.router)
 app.include_router(explain_llm.router)
 app.include_router(auth.router)
+app.include_router(history.router)
 
 app.mount('/uploads/avatars', StaticFiles(directory=settings.avatar_upload_dir), name='avatars')
