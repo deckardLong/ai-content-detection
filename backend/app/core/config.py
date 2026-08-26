@@ -6,7 +6,10 @@ class Settings(BaseSettings):
     max_length: int = 512
     device: str = 'cpu'
     ig_n_steps: int = 25
-    cors_origins: list[str] = ['http://localhost:5173', 'http://localhost:3000', 'ai-content-detection-production.up.railway.app', 'ai-content-detection.vercel.app']
+    cors_origins: list[str] = ['http://localhost:5173', 
+                               'http://localhost:3000', 
+                               'https://ai-content-detection-production.up.railway.app', 
+                               'https://ai-content-detection.vercel.app']
 
     gemini_api_key: str = ''
     gemini_model: str = 'gemini-2.5-flash'
