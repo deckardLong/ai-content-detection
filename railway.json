@@ -1,7 +1,8 @@
 {
   "build": {
     "builder": "dockerfile",
-    "context": "backend"
+    "context": "backend",
+    "dockerfile": "backend/Dockerfile"
   },
   "deploy": {
     "startCommand": "uvicorn app.main:app --host 0.0.0.0 --port 8000"
