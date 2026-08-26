@@ -121,10 +121,40 @@ graph LR
 
 ### Luồng thu thập dữ liệu
 
-**Sơ đồ luồng thu thập dữ liệu**
-<p align="center">
-  <img src="images/data_pipeline.png" width="550">
-</p>
+**Sơ đồ luồng thu thập dữ liệu (Mermaid)**
+
+```mermaid
+flowchart TD
+  subgraph Sources[Data sources]
+    A1[News sites (e.g. vietnamnet, quantrimang)]
+    A2[Manual uploads / CSVs / Notebooks]
+    A3[AI-generated outputs / rewrites]
+  end
+  A1 --> Ingest[Ingest / Collect raw text]
+  A2 --> Ingest
+  A3 --> Ingest
+
+  Ingest --> Preprocess[Preprocessing\n(Remove URLs/HTML, normalize whitespace, clean)]
+  Preprocess --> Dedupe[Deduplicate & group\n(group_id)]
+  Dedupe --> Label[Labeling\n(metadata: generated_type, original_text)]
+  Label --> Split[Split: train / val / test\n(data/subsets/*.csv)]
+  Split --> Token[Tokenization & Encoding\n(input_ids, attention_mask)\nmax_length=512, truncate]
+  Token --> Save[Save encoded datasets\n(data/encoded/*.pt)]
+  Save --> Dataset[Create PyTorch Dataset & DataLoader]
+  Dataset --> Train[Training / Evaluation\n(notebooks / src/training)]
+  Train --> Checkpoint[Model checkpoint\nmodels/best_model.pt]
+
+  %% Optional metadata path
+  Preprocess --> Metadata[Extract metadata\n(author, publish_date, url)]
+  Metadata --> Label
+
+  classDef source fill:#3498db,stroke:#333,color:#fff;
+  classDef process fill:#1abc9c,stroke:#333,color:#fff;
+  classDef storage fill:#f39c12,stroke:#333,color:#fff;
+  class A1,A2,A3 source;
+  class Ingest,Preprocess,Dedupe,Label,Split,Token,Dataset,Train process;
+  class Save,Checkpoint,Metadata storage;
+```
 
 ### Model
 
