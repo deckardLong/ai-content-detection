@@ -83,28 +83,42 @@ curl -X POST http://localhost:8000/explain-llm \
 <details>
 <summary><strong>Kiến trúc & quyết định kỹ thuật</strong></summary>
 
-![Architecture](images/architecture.png)
-
 ### Luồng xử lý
-**Giải thích via Gemini (natural language):**
 
-```
-Request (text)
-    ↓
-Tiền xử lý (loại HTML, URL, khoảng trắng)
-    ↓
-Tokenize (BamiBERT byte-level BPE)
-    ↓
-BamiBERT encoder (12 lớp transformer) + classifier
-    ↓
-Dự đoán → prob_human, prob_ai
-    ↓ (nếu gọi /explain)
-Integrated Gradients (Captum) → attribution score/từ
-    ↓ (nếu gọi /explain-llm)
-Tính feature signals → Gemini sinh bullet
+```mermaid
+graph LR
+    A["Text Input"] -->|Raw text| B["Preprocessing<br/>Remove URLs, HTML<br/>Normalize whitespace"]
+    B -->|Cleaned text| C["Tokenization<br/>Input IDs & attention mask"]
+    C -->|Tokens| D["BamiBERT Encoder<br/>12-layer Transformer"]
+    D -->|Encoded features| E["BamiBERT Classifier<br/>Label prediction &<br/>probability"]
+    
+    E -->|Output: prob_human<br/>prob_ai| F["Prediction Result<br/>Gauge UI"]
+    
+    E -->|If /explain| G["Integrated Gradients<br/>Captum"]
+    G -->|Attribution Scores| H["Highlighted Text<br/>4-tier opacity<br/>Red=AI, Green=Human"]
+    H -->|With scores on hover| I["Explainability UI"]
+    
+    E -->|If /explain-llm| J["Feature Signals<br/>Sentence length<br/>Punctuation density"]
+    J -->|Features + scores| K["Gemini LLM<br/>Grounded Prompting<br/>with API key"]
+    K -->|3-5 bullets| L["Natural Language<br/>Explanation"]
+    L -->|Cached result| I
+    
+    style A fill:#90EE90
+    style B fill:#FFB6C1
+    style C fill:#ADD8E6
+    style D fill:#FFFFE0
+    style E fill:#DEB887
+    style F fill:#E6E6FA
+    style G fill:#90EE90
+    style H fill:#E6B0FF
+    style I fill:#E6E6FA
+    style J fill:#90EE90
+    style K fill:#5F9EA0
+    style L fill:#90EE90
 ```
 
 ### Luồng thu thập dữ liệu
+
 **Sơ đồ luồng thu thập dữ liệu**
 <p align="center">
   <img src="images/data_pipeline.png" width="550">
