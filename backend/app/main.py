@@ -24,8 +24,8 @@ async def lifespan(app: FastAPI):
         try:
             hf_hub_download(
                 repo_id='DeckardLong/ai-content-detection-model',  
-                filename='best_model.pt',
-                local_dir='models'
+                filename='models/best_model.pt',
+                local_dir='.'
             )
             logging.info('Model downloaded successfully!')
         except Exception as e:
