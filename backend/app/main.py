@@ -2,6 +2,7 @@ import os
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from huggingface_hub import hf_hub_download
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import settings
@@ -17,6 +18,19 @@ os.makedirs(settings.avatar_upload_dir, exist_ok=True)
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     os.makedirs(settings.avatar_upload_dir, exist_ok=True)
+
+    if not os.path.exists('models/best_model.pt'):
+        logging.info(f'Dowloading model from HuggingFace...')
+        try:
+            hf_hub_download(
+                repo_id='DeckardLong/ai-content-detection-model',  
+                filename='best_model.pt',
+                local_dir='models'
+            )
+            logging.info('Model downloaded successfully!')
+        except Exception as e:
+            logging.error(f'Failed to download model: {e}')
+            raise
 
     service = ModelService(settings)
     service.load() # load model 1 time when server starts
