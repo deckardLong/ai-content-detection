@@ -121,7 +121,7 @@ graph LR
 
 ### Luồng thu thập dữ liệu
 
-**Sơ đồ luồng thu thập dữ liệu (Mermaid)**
+**Sơ đồ luồng thu thập dữ liệu**
 
 ```mermaid
 flowchart LR
