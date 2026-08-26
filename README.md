@@ -90,31 +90,33 @@ graph LR
     A["Text Input"] -->|Raw text| B["Preprocessing<br/>Remove URLs, HTML<br/>Normalize whitespace"]
     B -->|Cleaned text| C["Tokenization<br/>Input IDs & attention mask"]
     C -->|Tokens| D["BamiBERT Encoder<br/>12-layer Transformer"]
-    D -->|Encoded features| E["BamiBERT Classifier<br/>Label prediction &<br/>probability"]
+    D -->|Encoded features| E["Classifier<br/>Probability score"]
     
-    E -->|Output: prob_human<br/>prob_ai| F["Prediction Result<br/>Gauge UI"]
+    E -->|prob_human, prob_ai| F["Prediction Result<br/>Gauge UI"]
     
-    E -->|If /explain| G["Integrated Gradients<br/>Captum"]
+    E -->|If /explain| G["Integrated Gradients<br/>Captum Attribution"]
     G -->|Attribution Scores| H["Highlighted Text<br/>4-tier opacity<br/>Red=AI, Green=Human"]
-    H -->|With scores on hover| I["Explainability UI"]
+    H -->|With scores| I["Explainability UI"]
     
     E -->|If /explain-llm| J["Feature Signals<br/>Sentence length<br/>Punctuation density"]
-    J -->|Features + scores| K["Gemini LLM<br/>Grounded Prompting<br/>with API key"]
+    J -->|Features + scores| K["Gemini LLM<br/>Grounded Prompting"]
     K -->|3-5 bullets| L["Natural Language<br/>Explanation"]
-    L -->|Cached result| I
+    L -->|Cached| I
     
-    style A fill:#90EE90
-    style B fill:#FFB6C1
-    style C fill:#ADD8E6
-    style D fill:#FFFFE0
-    style E fill:#DEB887
-    style F fill:#E6E6FA
-    style G fill:#90EE90
-    style H fill:#E6B0FF
-    style I fill:#E6E6FA
-    style J fill:#90EE90
-    style K fill:#5F9EA0
-    style L fill:#90EE90
+    style A fill:#3498db,stroke:#2c3e50,stroke-width:2px,color:#fff
+    style B fill:#e74c3c,stroke:#2c3e50,stroke-width:2px,color:#fff
+    style C fill:#9b59b6,stroke:#2c3e50,stroke-width:2px,color:#fff
+    style D fill:#f39c12,stroke:#2c3e50,stroke-width:2px,color:#fff
+    style E fill:#1abc9c,stroke:#2c3e50,stroke-width:2px,color:#fff
+    style F fill:#16a085,stroke:#2c3e50,stroke-width:2px,color:#fff
+    
+    style G fill:#2ecc71,stroke:#2c3e50,stroke-width:2px,color:#fff
+    style H fill:#27ae60,stroke:#2c3e50,stroke-width:2px,color:#fff
+    style I fill:#16a085,stroke:#2c3e50,stroke-width:2px,color:#fff
+    
+    style J fill:#2ecc71,stroke:#2c3e50,stroke-width:2px,color:#fff
+    style K fill:#3498db,stroke:#2c3e50,stroke-width:2px,color:#fff
+    style L fill:#27ae60,stroke:#2c3e50,stroke-width:2px,color:#fff
 ```
 
 ### Luồng thu thập dữ liệu
