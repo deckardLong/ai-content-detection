@@ -2,6 +2,8 @@
 
 Phát hiện văn bản tiếng Việt do AI tạo ra — BamiBERT fine-tuned + FastAPI backend + React frontend + Docker.
 
+**Live Demo:** [ai-content-detection.vercel.app](https://ai-content-detection.vercel.app)
+
 ## Kết quả & Tính năng
 
 **Model accuracy: 93%** (F1 score cân bằng 0.93 trên cả 2 lớp — precision 0.99 cho Human, recall 0.99 cho AI)
