@@ -124,36 +124,32 @@ graph LR
 **Sơ đồ luồng thu thập dữ liệu (Mermaid)**
 
 ```mermaid
-flowchart TD
-  subgraph Sources[Data sources]
-    A1[News sites (e.g. vietnamnet, quantrimang)]
-    A2[Manual uploads / CSVs / Notebooks]
-    A3[AI-generated outputs / rewrites]
-  end
-  A1 --> Ingest[Ingest / Collect raw text]
-  A2 --> Ingest
-  A3 --> Ingest
+flowchart LR
+    Data["Data"]
+    
+    subgraph AI ["AI"]
+        AI_Rewritten["AI Rewritten"]
+        AI_Generated["AI Generated"]
+    end
+    
+    Human["Human"]
 
-  Ingest --> Preprocess[Preprocessing\n(Remove URLs/HTML, normalize whitespace, clean)]
-  Preprocess --> Dedupe[Deduplicate & group\n(group_id)]
-  Dedupe --> Label[Labeling\n(metadata: generated_type, original_text)]
-  Label --> Split[Split: train / val / test\n(data/subsets/*.csv)]
-  Split --> Token[Tokenization & Encoding\n(input_ids, attention_mask)\nmax_length=512, truncate]
-  Token --> Save[Save encoded datasets\n(data/encoded/*.pt)]
-  Save --> Dataset[Create PyTorch Dataset & DataLoader]
-  Dataset --> Train[Training / Evaluation\n(notebooks / src/training)]
-  Train --> Checkpoint[Model checkpoint\nmodels/best_model.pt]
+    Data -->|AI web| AI_Rewritten
+    Data -->|AI tools & API| AI_Generated
+    Data -->|Crawl web| Human
 
-  %% Optional metadata path
-  Preprocess --> Metadata[Extract metadata\n(author, publish_date, url)]
-  Metadata --> Label
+    %% Custom style giống với hình gốc
+    classDef dataStyle fill:#d4edda,stroke:#28a745,stroke-width:1px,color:#000;
+    classDef aiGroupStyle fill:#f3e5f5,stroke:#ce93d8,stroke-width:1px,stroke-dasharray: 5 5,color:#000;
+    classDef aiRewrittenStyle fill:#e3f2fd,stroke:#90cafb,stroke-width:1px,stroke-dasharray: 5 5,color:#000;
+    classDef aiGenStyle fill:#f3e5f5,stroke:#ab47bc,stroke-width:1px,stroke-dasharray: 5 5,color:#000;
+    classDef humanStyle fill:#f8d7da,stroke:#f5c6cb,stroke-width:1px,stroke-dasharray: 5 5,color:#000;
 
-  classDef source fill:#3498db,stroke:#333,color:#fff;
-  classDef process fill:#1abc9c,stroke:#333,color:#fff;
-  classDef storage fill:#f39c12,stroke:#333,color:#fff;
-  class A1,A2,A3 source;
-  class Ingest,Preprocess,Dedupe,Label,Split,Token,Dataset,Train process;
-  class Save,Checkpoint,Metadata storage;
+    class Data dataStyle;
+    class AI aiGroupStyle;
+    class AI_Rewritten aiRewrittenStyle;
+    class AI_Generated aiGenStyle;
+    class Human humanStyle;
 ```
 
 ### Model
