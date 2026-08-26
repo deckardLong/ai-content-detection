@@ -7,6 +7,8 @@ services:
       - "8000:8000"
     volumes:
       - ./models:/app/models:ro
+      - ./database:/app/database
+      - ./uploads:/app/uploads
     environment:
       APP_CHECKPOINT_PATH: /app/models/best_model.pt
       APP_DEVICE: cpu

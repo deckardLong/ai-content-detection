@@ -11,6 +11,7 @@ from .routers import health, explain, predict, explain_llm, auth, history
 from .core.database import Base, engine
 
 logging.basicConfig(level=logging.INFO)
+os.makedirs(settings.avatar_upload_dir, exist_ok=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
