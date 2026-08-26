@@ -125,25 +125,25 @@ graph LR
 
 ```mermaid
 flowchart LR
-    Data["Data"]
+    Data("Data")
     
     subgraph AI ["AI"]
-        AI_Rewritten["AI Rewritten"]
-        AI_Generated["AI Generated"]
+        AI_Rewritten("AI Rewritten")
+        AI_Generated("AI Generated")
     end
     
-    Human["Human"]
+    Human("Human")
 
     Data -->|AI web| AI_Rewritten
     Data -->|AI tools & API| AI_Generated
     Data -->|Crawl web| Human
 
-    %% Custom style giống với hình gốc
-    classDef dataStyle fill:#d4edda,stroke:#28a745,stroke-width:1px,color:#000;
-    classDef aiGroupStyle fill:#f3e5f5,stroke:#ce93d8,stroke-width:1px,stroke-dasharray: 5 5,color:#000;
-    classDef aiRewrittenStyle fill:#e3f2fd,stroke:#90cafb,stroke-width:1px,stroke-dasharray: 5 5,color:#000;
-    classDef aiGenStyle fill:#f3e5f5,stroke:#ab47bc,stroke-width:1px,stroke-dasharray: 5 5,color:#000;
-    classDef humanStyle fill:#f8d7da,stroke:#f5c6cb,stroke-width:1px,stroke-dasharray: 5 5,color:#000;
+    %% Styling bo tròn góc & viền nét đứt giống hình gốc
+    classDef dataStyle fill:#d4edda,stroke:#28a745,stroke-width:1.5px,color:#000;
+    classDef aiGroupStyle fill:#f3e5f5,stroke:#ce93d8,stroke-width:1.5px,stroke-dasharray: 5 5,color:#000;
+    classDef aiRewrittenStyle fill:#e3f2fd,stroke:#90cafb,stroke-width:1.5px,stroke-dasharray: 5 5,color:#000;
+    classDef aiGenStyle fill:#f3e5f5,stroke:#ab47bc,stroke-width:1.5px,stroke-dasharray: 5 5,color:#000;
+    classDef humanStyle fill:#f8d7da,stroke:#f5c6cb,stroke-width:1.5px,stroke-dasharray: 5 5,color:#000;
 
     class Data dataStyle;
     class AI aiGroupStyle;
