@@ -5,10 +5,10 @@ class Settings(BaseSettings):
     checkpoint_path: str = 'models/best_model.pt'
     max_length: int = 512
     device: str = 'cpu'
-    ig_n_steps: int = 5
+    ig_n_steps: int = 25
     cors_origins: list[str] = ['http://localhost:5173', 
                                'http://localhost:3000', 
-                               'https://ai-content-detection-production.up.railway.app', 
+                               'https://ai-content-detection-production-9a48.up.railway.app', 
                                'https://ai-content-detection.vercel.app']
 
     gemini_api_key: str = ''
