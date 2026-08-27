@@ -1,7 +1,7 @@
 import re
 import hashlib
 import logging
-import google.generativeai as genai
+from google import genai
 from..core.config import Settings
 from .rate_limiter import GlobalRateLimiter
 
@@ -34,9 +34,10 @@ class GeminiExplanationService:
         self._cache_max_size = 200
         self.rate_limiter = GlobalRateLimiter(max_calls=settings.gemini_rate_limit_per_minute)
 
+        self.model_name = settings.gemini_model
+
         if self.enabled:
-            genai.configure(api_key=settings.gemini_api_key)
-            self.model_client = genai.GenerativeModel(settings.gemini_model)
+            self.client = genai.Client(api_key=settings.gemini_api_key)
 
     @staticmethod
     def _cache_key(text):
@@ -86,7 +87,10 @@ class GeminiExplanationService:
         )
 
         try: 
-            response = self.model_client.generate_content(prompt)
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt
+            )
             text = response.text.strip()
             bullets = self._parse_bullets(text)
         except Exception as e:
