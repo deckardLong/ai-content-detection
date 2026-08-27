@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     checkpoint_path: str = 'models/best_model.pt'
     max_length: int = 512
     device: str = 'cpu'
-    ig_n_steps: int = 25
+    ig_n_steps: int = 10
     cors_origins: list[str] = ['http://localhost:5173', 
                                'http://localhost:3000', 
                                'https://ai-content-detection-production.up.railway.app', 
