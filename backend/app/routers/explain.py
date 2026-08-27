@@ -1,4 +1,5 @@
 import logging
+import time
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..dependencies import get_model_service, get_current_user_optional
@@ -13,8 +14,13 @@ router = APIRouter()
 
 @router.post('/explain', response_model=ExplainResponse)
 def explain(req: TextRequest, service: ModelService = Depends(get_model_service), current_user: User | None = Depends(get_current_user_optional), db: Session = Depends(get_db)):
+    logger.info(f"[EXPLAIN] Request received, text length: {len(req.text)}")
     try:
+        start = time.time()
+        logger.info(f"[EXPLAIN] Starting Captum computation...")
         result = service.explain(req.text)
+        elapsed = time.time() - start
+        logger.info(f"[EXPLAIN] Computation done in {elapsed:.2f}s")
     except Exception:
         logger.exception('Explain failed')
         raise HTTPException(status_code=500, detail='Không thể giải thích văn bản này')
