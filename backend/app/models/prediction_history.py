@@ -7,7 +7,7 @@ class PredictionHistory(Base):
     __tablename__ = 'prediction_history'
 
     id = Column(String(40), primary_key=True, default=lambda: generate_meaningful_id('pred'))
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
+    user_id = Column(String(40), ForeignKey('users.id'), nullable=False, index=True)
     text = Column(Text, nullable=False)
     predicted_class = Column(String(20), nullable=False)
     prob_ai = Column(Float, nullable=False)
