@@ -1,0 +1,50 @@
+% !TEX root = main.tex
+\chapter{KẾT LUẬN VÀ PHƯƠNG HƯỚNG PHÁT TRIỂN HỆ THỐNG TRONG TƯƠNG LAI}
+
+\section{Kết luận}
+
+Đồ án đã xây dựng được một hệ thống phát hiện văn bản tiếng Việt do con người viết hoặc do mô hình ngôn ngữ tạo ra, tập trung vào nhóm bài báo và nội dung thuộc lĩnh vực công nghệ thông tin. Hệ thống được triển khai theo một quy trình tương đối hoàn chỉnh, bắt đầu từ thu thập dữ liệu, làm sạch và chuẩn hóa văn bản, token hóa, huấn luyện mô hình, đánh giá kết quả, đến tích hợp mô hình vào ứng dụng web.
+
+Về dữ liệu, đồ án đã xây dựng tập dữ liệu gồm 5.000 mẫu, bao gồm 2.500 mẫu Human và 2.500 mẫu AI. Nhóm AI được phân thành hai dạng chính là văn bản được sinh hoàn toàn từ đầu và văn bản được AI viết lại dựa trên nội dung Human. Dữ liệu được chia thành tập huấn luyện, tập xác thực và tập kiểm thử theo nhóm liên quan giữa văn bản gốc và văn bản viết lại. Cách chia này giúp hạn chế hiện tượng một văn bản gốc hoặc nội dung tương đương xuất hiện đồng thời ở nhiều tập dữ liệu.
+
+Về mô hình, đồ án sử dụng BamiBERT làm mô hình biểu diễn ngôn ngữ tiếng Việt và bổ sung classification head để thực hiện bài toán phân loại nhị phân. Mô hình sử dụng vector biểu diễn của token \texttt{[CLS]} làm đại diện cho toàn bộ văn bản, sau đó ánh xạ sang hai lớp Human và AI. Kết quả thực nghiệm cho thấy mô hình đạt accuracy xấp xỉ 93\% và F1-score cân bằng khoảng 0,93 trên hai lớp. Precision của lớp Human đạt khoảng 0,99, recall của lớp AI đạt khoảng 0,99, cho thấy mô hình có khả năng nhận diện tốt các mẫu trong phạm vi dữ liệu đã xây dựng.
+
+Bên cạnh kết quả phân loại, hệ thống còn cung cấp khả năng giải thích dự đoán. Thuật toán Integrated Gradients được sử dụng để tính điểm đóng góp của từng token đối với kết quả dự đoán. Các điểm này được trực quan hóa trên giao diện bằng cách tô màu những token có xu hướng ủng hộ lớp AI hoặc Human, giúp người dùng quan sát được các tín hiệu mà mô hình đã sử dụng. Ngoài ra, hệ thống tích hợp Gemini API để chuyển các điểm đóng góp và một số đặc trưng thống kê của văn bản thành giải thích bằng ngôn ngữ tự nhiên. Cơ chế grounded prompting giúp phần giải thích tập trung vào các bằng chứng đã được tính toán từ chính văn bản đầu vào.
+
+Về triển khai, hệ thống gồm backend FastAPI, frontend React và các thành phần được đóng gói bằng Docker. Backend cung cấp các API cho kiểm tra trạng thái, dự đoán, giải thích bằng Integrated Gradients và giải thích bằng Gemini. Mô hình được nạp một lần khi khởi động dịch vụ, phù hợp với yêu cầu suy luận trên CPU và giúp hạn chế thời gian xử lý lặp lại. Giao diện web cung cấp luồng thao tác từ nhập văn bản, xem xác suất dự đoán đến theo dõi phần giải thích chi tiết.
+
+Nhìn chung, đồ án đã đáp ứng mục tiêu xây dựng một hệ thống thử nghiệm có khả năng phát hiện và giải thích văn bản tiếng Việt do AI tạo ra. Kết quả đạt được cho thấy việc kết hợp mô hình ngôn ngữ tiếng Việt, phương pháp giải thích dựa trên attribution và giao diện web là một hướng tiếp cận phù hợp cho bài toán này.
+
+\section{Hạn chế của hệ thống}
+
+Mặc dù đạt được kết quả khả quan, hệ thống vẫn còn một số hạn chế cần được xem xét khi sử dụng trong thực tế.
+
+\begin{itemize}
+    \item Nhãn Human được suy ra từ nguồn bài báo và quy trình thu thập, chưa được xác minh hoàn toàn bằng quy trình gán nhãn thủ công ở cấp độ tác giả. Vì vậy, một số văn bản Human vẫn có thể đã sử dụng công cụ AI trong quá trình biên tập.
+    \item Dữ liệu AI chủ yếu được tạo bằng một số mô hình ngôn ngữ nhất định. Các mô hình khác có phong cách sinh văn bản, khả năng bắt chước văn phong con người và đặc điểm ngôn ngữ khác nhau có thể làm giảm khả năng tổng quát hóa của hệ thống.
+    \item Nhóm AI-rewritten khó phân biệt hơn nhóm AI được sinh hoàn toàn từ đầu vì nội dung gốc của con người vẫn được giữ lại một phần. Đây là trường hợp có nguy cơ làm giảm hiệu quả phát hiện và cần được đánh giá riêng.
+    \item Văn bản dài được giới hạn theo số lượng token tối đa khi suy luận. Việc cắt phần vượt quá giới hạn có thể làm mất thông tin ở cuối bài viết và ảnh hưởng đến kết quả dự đoán.
+    \item Xác suất mô hình trả về chưa được hiệu chỉnh đầy đủ theo ý nghĩa xác suất thực tế. Vì vậy, giá trị phần trăm trên giao diện nên được hiểu là mức độ tin cậy của mô hình, không phải bằng chứng tuyệt đối về nguồn gốc văn bản.
+    \item Điểm attribution cho biết mối liên hệ giữa token và dự đoán của mô hình, nhưng không thể tự nó chứng minh một token là nguyên nhân duy nhất dẫn đến kết quả. Các token có thể tác động lẫn nhau thông qua ngữ cảnh của toàn bộ câu.
+    \item Phần giải thích bằng Gemini phụ thuộc vào dịch vụ bên ngoài, hạn mức API và chất lượng phản hồi của mô hình ngôn ngữ. Dù đã sử dụng prompt có ràng buộc và cơ chế cache, kết quả vẫn cần được xem là phần hỗ trợ diễn giải chứ không thay thế kết quả phân loại.
+    \item Bộ kiểm thử tự động cho toàn bộ luồng backend, frontend và các trường hợp lỗi đầu vào vẫn chưa đầy đủ. Điều này có thể làm phát sinh rủi ro khi thay đổi mô hình, API hoặc giao diện.
+\end{itemize}
+
+\section{Phương hướng phát triển}
+
+Trong các phiên bản tiếp theo, hệ thống có thể được phát triển theo các hướng sau:
+
+\begin{enumerate}
+    \item \textbf{Mở rộng và nâng cao chất lượng dữ liệu:} Thu thập thêm văn bản từ nhiều lĩnh vực, nguồn tin và giai đoạn thời gian khác nhau. Dữ liệu cần được gán nhãn thủ công hoặc kiểm tra chéo bởi nhiều người để giảm sai lệch nhãn. Đồng thời, nên bổ sung nhiều mô hình sinh văn bản và nhiều mức độ chỉnh sửa khác nhau cho nhóm AI-rewritten.
+    \item \textbf{Cải thiện xử lý văn bản dài:} Thay thế cách cắt trực tiếp bằng sliding-window inference hoặc chia văn bản thành nhiều đoạn có chồng lấn. Kết quả của các đoạn có thể được tổng hợp để đưa ra dự đoán cho toàn bộ bài viết, đồng thời giữ lại thông tin ở những phần vượt quá giới hạn token.
+    \item \textbf{Đánh giá theo nhiều nhóm dữ liệu:} Bên cạnh accuracy và F1-score, cần báo cáo confusion matrix, ROC-AUC, PR-AUC và kết quả theo từng nhóm Human, Generated và Rewritten. Có thể bổ sung tập kiểm thử ngoài miền để đo khả năng hoạt động trên nguồn tin hoặc chủ đề chưa xuất hiện trong quá trình huấn luyện.
+    \item \textbf{Hiệu chỉnh độ tin cậy:} Áp dụng temperature scaling hoặc các phương pháp calibration khác trên tập validation. Việc này giúp giá trị xác suất phản ánh tốt hơn mức độ tin cậy và hỗ trợ người dùng nhận biết các trường hợp mô hình chưa chắc chắn.
+    \item \textbf{Phát triển khả năng giải thích:} Kết hợp Integrated Gradients với các phương pháp giải thích khác, thực hiện kiểm tra tính ổn định của attribution và bổ sung đánh giá định lượng về độ trung thực của giải thích. Giao diện cũng có thể cho phép người dùng xem các đoạn văn hoặc câu có ảnh hưởng lớn thay vì chỉ xem từng token.
+    \item \textbf{Tăng tính tin cậy của giải thích bằng LLM:} Bổ sung kiểm tra định dạng, kiểm tra sự phù hợp giữa nội dung Gemini sinh ra và các bằng chứng đầu vào, đồng thời cung cấp trạng thái rõ ràng khi dịch vụ LLM không khả dụng. Có thể nghiên cứu thêm các mô hình cục bộ để giảm phụ thuộc vào API bên ngoài.
+    \item \textbf{Hoàn thiện kiểm thử và vận hành:} Bổ sung unit test, integration test và kiểm thử giao diện cho các trường hợp văn bản rỗng, văn bản quá dài, ký tự đặc biệt, lỗi mô hình và lỗi dịch vụ Gemini. Ngoài ra, có thể bổ sung logging, theo dõi thời gian phản hồi, giới hạn tốc độ và cơ chế quản lý phiên bản mô hình.
+    \item \textbf{Mở rộng chức năng ứng dụng:} Trong tương lai, hệ thống có thể hỗ trợ tải tệp, phân tích nhiều văn bản theo lô, lưu lịch sử dự đoán có kiểm soát quyền truy cập và cung cấp báo cáo kết quả. Các chức năng này cần đi kèm với biện pháp bảo vệ dữ liệu và thông báo rõ ràng về giới hạn của hệ thống.
+\end{enumerate}
+
+\section{Tổng kết}
+
+Hệ thống trong đồ án là một nền tảng thử nghiệm cho bài toán phát hiện nội dung AI tiếng Việt, kết hợp giữa phân loại văn bản, giải thích dựa trên attribution và giải thích bằng ngôn ngữ tự nhiên. Kết quả hiện tại cho thấy mô hình có khả năng hoạt động tốt trên tập dữ liệu được xây dựng, đồng thời kiến trúc triển khai đã tạo nền tảng để tiếp tục mở rộng dữ liệu, cải thiện độ tin cậy và đánh giá sâu hơn trong các nghiên cứu tiếp theo.

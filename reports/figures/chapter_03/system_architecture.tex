@@ -1,0 +1,58 @@
+\documentclass[border=10pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[vietnamese]{babel}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning}
+
+\begin{document}
+\begin{tikzpicture}[
+    node/.style={draw, rounded corners=4pt, align=center, text width=3.1cm,
+                 minimum height=1.4cm, font=\small, thick},
+    arr/.style={-Stealth, thick},
+    lbl/.style={font=\scriptsize}
+]
+
+% ---------- ROW 1 ----------
+\node[node, fill=green!20]  (data) at (0,0)      {Dữ liệu đầu vào\\5000 bài báo\\IT, AI,...};
+\node[node, fill=red!20]    (prep) at (5,0)      {Tiền xử lý dữ liệu\\URL, HTML,\\khoảng trắng};
+\node[node, fill=yellow!25] (tok)  at (10,0)     {Tokenization\\Input IDs + mask};
+\node[node, fill=orange!25] (bert) at (15,0)     {BamiBERT Encoder\\12 lớp Transformer};
+
+% ---------- ROW 2 ----------
+\node[node, fill=green!20]  (pred) at (9.3,-4)   {Kết quả dự đoán\\Hiển thị xác suất\\AI / Human};
+\node[node, fill=blue!20]   (cls)  at (15,-4)    {BamiBERT Classifier\\Probability score};
+
+% ---------- ROW 3 ----------
+\node[node, fill=red!20]    (ui)        at (0,-8)  {Explainability UI};
+\node[node, fill=cyan!20]   (highlight) at (5,-8)  {Highlighted Text\\Màu xanh / đỏ};
+\node[node, fill=cyan!20]   (ig)        at (10,-8) {Integrated Gradients\\Captum};
+
+% ---------- ROW 4 ----------
+\node[node, fill=violet!20] (explain)  at (0,-12)  {Giải thích bằng\\ngôn ngữ tự nhiên};
+\node[node, fill=green!20]  (gemini)   at (5,-12)  {Gemini LLM};
+\node[node, fill=violet!20] (features) at (10,-12) {Features LLM};
+
+% ================= ARROWS =================
+\draw[arr] (data) -- (prep);
+\draw[arr] (prep) -- (tok);
+\draw[arr] (tok)  -- (bert);
+
+\draw[arr] (bert.south) -- node[lbl,right] {encoded features} (cls.north);
+\draw[arr] (cls.west) -- node[lbl,above,align=center] {prob\_human,\\prob\_ai} (pred.east);
+
+% "if explain" -- L-path vuông góc thật sự
+\draw[arr] (cls.south) -- ++(0,-1.2) -| node[lbl, pos=0.25, above] {if explain} (ig.north);
+
+\draw[arr] (ig.west)        -- node[lbl,above,align=center] {attribution\\scores} (highlight.east);
+\draw[arr] (highlight.west) -- node[lbl,above] {with scores} (ui.east);
+\draw[arr] (ig.south) -- node[lbl,right] {top K words} (features.north);
+
+% "if explain-lm" -- L-path vuông góc thật sự
+\draw[arr] (cls.east) -- ++(2.3,0) |- node[lbl, pos=0.75, above] {if explain-lm} (features.east);
+
+\draw[arr] (features.west) -- node[lbl,above] {features \& scores} (gemini.east);
+\draw[arr] (gemini.west)   -- node[lbl,above] {3--5 mục} (explain.east);
+\draw[arr] (explain.north) -- node[lbl,left] {cached} (ui.south);
+
+\end{tikzpicture}
+\end{document}

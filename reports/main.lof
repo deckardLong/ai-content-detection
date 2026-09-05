@@ -1,0 +1,44 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Xử lý ngôn ngữ tự nhiên - Natural Language Processing}}{3}{figure.caption.8}%
+\contentsline {figure}{\numberline {2}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Biểu diễn dữ liệu thô dưới dạng vector embedding}}{4}{figure.caption.9}%
+\contentsline {figure}{\numberline {3}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Kiến trúc mô hình Transformer}}{5}{figure.caption.10}%
+\contentsline {figure}{\numberline {4}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Các tập dữ liệu dùng để huấn luyện BamiBERT}}{7}{figure.caption.11}%
+\contentsline {figure}{\numberline {5}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Kết quả dự đoán của BamiBERT so với các mô hình BERT khác}}{7}{figure.caption.12}%
+\contentsline {figure}{\numberline {6}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Token \texttt {[CLS]} trong chuỗi}}{8}{figure.caption.13}%
+\contentsline {figure}{\numberline {7}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Quá trình fine-tuning}}{9}{figure.caption.14}%
+\contentsline {figure}{\numberline {8}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Thuật toán diễn giải mô hình - Explainable AI}}{9}{figure.caption.15}%
+\contentsline {figure}{\numberline {9}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Công thức tích phân gradient tích hợp của thuật toán Integrated Gradients}}{10}{figure.caption.16}%
+\contentsline {figure}{\numberline {10}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Mô hình ngôn ngữ lớn - Large Language Model (LLM)}}{11}{figure.caption.17}%
+\contentsline {figure}{\numberline {11}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Mô hình ngôn ngữ lớn (Gemini)}}{12}{figure.caption.18}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {12}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Kiến trúc hệ thống}}{13}{figure.caption.19}%
+\contentsline {figure}{\numberline {13}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Các nguồn dữ liệu thu thập}}{14}{figure.caption.20}%
+\contentsline {figure}{\numberline {14}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Các bài báo văn bản thu thập qua các năm}}{15}{figure.caption.21}%
+\contentsline {figure}{\numberline {15}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Cấu trúc dữ liệu của hệ thống}}{17}{figure.caption.22}%
+\contentsline {figure}{\numberline {16}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Phân bố nhãn \texttt {label}}}{18}{figure.caption.24}%
+\contentsline {figure}{\numberline {17}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Phân bố phương pháp tạo sinh dữ liệu}}{18}{figure.caption.25}%
+\contentsline {figure}{\numberline {18}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Phân bố độ dài của các phương pháp tạo sinh dữ liệu}}{19}{figure.caption.26}%
+\contentsline {figure}{\numberline {19}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Đoạn văn bản sau khi đã làm sạch}}{20}{figure.caption.27}%
+\contentsline {figure}{\numberline {20}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Đoạn văn bản sau đã nhóm theo ID}}{22}{figure.caption.28}%
+\contentsline {figure}{\numberline {21}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Tỉ lệ tập dữ liệu sau khi chia}}{22}{figure.caption.29}%
+\contentsline {figure}{\numberline {22}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Hiện tượng dropout trong mạng neuron}}{23}{figure.caption.30}%
+\contentsline {figure}{\numberline {23}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Quá trình fine-tuning}}{28}{figure.caption.31}%
+\contentsline {figure}{\numberline {24}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Điểm của mô hình huấn luyện qua các epoch}}{29}{figure.caption.32}%
+\contentsline {figure}{\numberline {25}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Quá trình đưa ra giải thích}}{30}{figure.caption.33}%
+\contentsline {figure}{\numberline {26}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Lược đồ trực quan hóa CSDL}}{34}{figure.caption.35}%
+\contentsline {figure}{\numberline {27}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Giao diện đăng ký tài khoản}}{36}{figure.caption.41}%
+\contentsline {figure}{\numberline {28}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Giao diện đăng nhập tài khoản}}{37}{figure.caption.42}%
+\contentsline {figure}{\numberline {29}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Giao diện trang chủ}}{37}{figure.caption.43}%
+\contentsline {figure}{\numberline {30}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Giao diện dự đoán}}{38}{figure.caption.44}%
+\contentsline {figure}{\numberline {31}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Giao diện hiển thị lịch sử}}{38}{figure.caption.45}%
+\contentsline {figure}{\numberline {32}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Giao diện hiển thị text highlight}}{39}{figure.caption.46}%
+\contentsline {figure}{\numberline {33}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Giao diện hiển thị kết quả giải thích LLM}}{39}{figure.caption.47}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {34}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Bảng kết quả thống kê}}{41}{figure.caption.53}%
+\contentsline {figure}{\numberline {35}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Ma trận sai lầm}}{41}{figure.caption.55}%
+\contentsline {figure}{\numberline {36}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Độ chính xác của ba phương pháp sinh dữ liệu}}{42}{figure.caption.57}%
+\contentsline {figure}{\numberline {37}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Đường cong ROC}}{42}{figure.caption.59}%
+\contentsline {figure}{\numberline {38}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Độ bất trung thực và Độ ổn định}}{43}{figure.caption.60}%
+\contentsline {figure}{\numberline {39}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Attribution score của các token tương ứng với ba phương pháp tạo dữ liệu}}{44}{figure.caption.61}%
+\addvspace {10\p@ }

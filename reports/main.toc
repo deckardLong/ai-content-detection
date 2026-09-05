@@ -1,0 +1,86 @@
+\xpg@aux {}{vietnamese}
+\contentsline {chapter}{LỜI CẢM ƠN}{i}{chapter*.1}%
+\contentsline {chapter}{NHẬN XÉT CỦA GIẢNG VIÊN HƯỚNG DẪN}{ii}{chapter*.2}%
+\contentsline {chapter}{DANH MỤC TỪ VIẾT TẮT}{viii}{chapter*.6}%
+\contentsline {chapter}{MỞ ĐẦU}{ix}{chapter*.7}%
+\contentsline {chapter}{\numberline {1}GIỚI THIỆU ĐỀ TÀI}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Lý do chọn đề tài}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Mục tiêu nghiên cứu}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Đối tượng nghiên cứu}{2}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Bố cục đề tài}{2}{section.1.4}%
+\contentsline {chapter}{\numberline {2}CÁC CÔNG NGHỆ VÀ CƠ SỞ LÝ THUYẾT}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Xử lý ngôn ngữ tự nhiên}{3}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Vai trò của xử lý ngôn ngữ tự nhiên}{3}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Biểu diễn văn bản và embedding}{4}{subsection.2.1.2}%
+\contentsline {section}{\numberline {2.2}Mô hình Transformer và BERT}{5}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Kiến trúc Transformer}{5}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}BERT và BamiBERT}{6}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Token \texttt {[CLS]} và vector đại diện cho câu}{8}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}Classification head}{8}{subsection.2.2.4}%
+\contentsline {subsection}{\numberline {2.2.5}Fine-tune mô hình tiền huấn luyện}{8}{subsection.2.2.5}%
+\contentsline {section}{\numberline {2.3}Thuật toán diễn giải mô hình (Explainable AI - XAI)}{9}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Khái niệm Explainable AI}{9}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Thuật toán Integrated Gradients}{10}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Attribution trong bài toán phân loại văn bản}{11}{subsection.2.3.3}%
+\contentsline {section}{\numberline {2.4}Mô hình ngôn ngữ lớn và ứng dụng trong hệ thống}{11}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Mô hình ngôn ngữ lớn (Large Language Model)}{11}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Ứng dụng LLM trong ứng dụng giải thích kết quả}{12}{subsection.2.4.2}%
+\contentsline {chapter}{\numberline {3}Dữ liệu và phương pháp xây dựng hệ thống}{13}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Tổng quan hệ thống}{13}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Thu thập và xây dựng dữ liệu}{14}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Nguồn dữ liệu}{14}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Thu thập dữ liệu văn bản Human}{14}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Xây dựng dữ liệu AI}{16}{subsection.3.2.3}%
+\contentsline {subsection}{\numberline {3.2.4}Xây dựng dữ liệu AI-rewritten}{16}{subsection.3.2.4}%
+\contentsline {subsection}{\numberline {3.2.5}Cấu trúc và tổ chức dữ liệu}{17}{subsection.3.2.5}%
+\contentsline {subsection}{\numberline {3.2.6}Phân bố dữ liệu}{18}{subsection.3.2.6}%
+\contentsline {section}{\numberline {3.3}Tiền xử lý dữ liệu}{20}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Làm sạch và chuẩn hóa văn bản}{20}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Tokenization}{20}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}Xây dựng và fine-tuning mô hình phân loại}{22}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Tạo group ID}{22}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Chia tập dữ liệu}{22}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Định nghĩa mô hình phân loại phù hợp với bài toán}{22}{subsection.3.4.3}%
+\contentsline {subsection}{\numberline {3.4.4}Fine-tuning mô hình phân loại}{23}{subsection.3.4.4}%
+\contentsline {section}{\numberline {3.5}Xây dựng chức năng giải thích}{29}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Tổng quan quy trình giải thích}{29}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Tính toán mức độ đóng góp bằng Integrated Gradients}{31}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}Xử lý và tổng hợp Attribution}{32}{subsection.3.5.3}%
+\contentsline {subsection}{\numberline {3.5.4}Sinh giải thích bằng LLM}{33}{subsection.3.5.4}%
+\contentsline {section}{\numberline {3.6}Xây dựng backend}{34}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}Mô hình thực thể kết hợp (ERD)}{34}{subsection.3.6.1}%
+\contentsline {subsection}{\numberline {3.6.2}Thiết kế chi tiết các bảng}{34}{subsection.3.6.2}%
+\contentsline {subsubsection}{Bảng user}{34}{section*.36}%
+\contentsline {subsubsection}{Bảng prediction history}{35}{section*.38}%
+\contentsline {subsection}{\numberline {3.6.3}Thiết kế các API chính cho hệ thống}{35}{subsection.3.6.3}%
+\contentsline {section}{\numberline {3.7}Xây dựng giao diện}{36}{section.3.7}%
+\contentsline {subsection}{\numberline {3.7.1}Giao diện đăng ký}{36}{subsection.3.7.1}%
+\contentsline {subsection}{\numberline {3.7.2}Giao diện đăng nhập}{37}{subsection.3.7.2}%
+\contentsline {subsection}{\numberline {3.7.3}Giao diện trang chủ}{37}{subsection.3.7.3}%
+\contentsline {subsection}{\numberline {3.7.4}Giao diện dự đoán}{38}{subsection.3.7.4}%
+\contentsline {subsection}{\numberline {3.7.5}Giao diện lịch sử}{38}{subsection.3.7.5}%
+\contentsline {subsection}{\numberline {3.7.6}Giao diện giải thích highlight text}{39}{subsection.3.7.6}%
+\contentsline {subsection}{\numberline {3.7.7}Giao diện giải thích bằng LLM}{39}{subsection.3.7.7}%
+\contentsline {chapter}{\numberline {4}Thực nghiệm và đánh giá hệ thống}{40}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Thực nghiệm và đánh giá mô hình phân loại}{40}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Các tiêu chí đánh giá}{40}{subsection.4.1.1}%
+\contentsline {subsubsection}{Độ chính xác (Precision)}{40}{section*.48}%
+\contentsline {subsubsection}{Độ bao phủ (Recall)}{40}{section*.49}%
+\contentsline {subsubsection}{Điểm F1 (F1-score)}{40}{section*.50}%
+\contentsline {subsubsection}{Đường cong ROC (ROC Curve)}{40}{section*.51}%
+\contentsline {subsection}{\numberline {4.1.2}Kết quả thực nghiệm}{41}{subsection.4.1.2}%
+\contentsline {subsubsection}{Bảng kết quả}{41}{section*.52}%
+\contentsline {subsubsection}{Ma trận sai lầm}{41}{section*.54}%
+\contentsline {subsubsection}{Độ chính xác của ba phương pháp sinh dữ liệu}{42}{section*.56}%
+\contentsline {subsubsection}{Đường cong ROC}{42}{section*.58}%
+\contentsline {section}{\numberline {4.2}Đánh giá thuật toán giải thích Integrated Gradients}{43}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Đánh giá hội tụ và độ trung thực của giải thích}{43}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Phân tích kết quả attribution}{44}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Đánh giá kết quả giải thích bằng LLM}{44}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Thiết lập sinh giải thích}{44}{subsection.4.3.1}%
+\contentsline {chapter}{\numberline {5}KẾT LUẬN VÀ PHƯƠNG HƯỚNG PHÁT TRIỂN HỆ THỐNG TRONG TƯƠNG LAI}{47}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Kết luận}{47}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Hạn chế của hệ thống}{48}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Phương hướng phát triển}{48}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Tổng kết}{49}{section.5.4}%
+\contentsline {chapter}{TÀI LIỆU THAM KHẢO}{50}{chapter*.64}%

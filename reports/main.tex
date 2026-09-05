@@ -1,0 +1,146 @@
+\documentclass[12pt,a4paper]{report}
+
+% Compile with XeLaTeX or LuaLaTeX for Vietnamese text.
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage{vietnamese}
+\setmainfont{Times New Roman}
+
+\usepackage[a4paper,left=3.5cm,right=2cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{fancyvrb}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{chngcntr}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning}
+\counterwithout{figure}{chapter}
+\counterwithout{table}{chapter}
+\usepackage[hidelinks]{hyperref}
+\usepackage{caption}
+\captionsetup[figure]{
+    name=Hình,
+    labelsep=colon,
+    font=it
+}
+\captionsetup[table]{
+    name=Bảng,
+    labelsep=colon,
+    font=it
+}
+\DeclareCaptionType{listing}[Đoạn mã]
+\counterwithout{listing}{chapter}
+\captionsetup[listing]{
+    labelsep=colon,
+    font=it,
+    skip=2pt
+}
+\lstdefinestyle{pythoncode}{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{green!50!black}\bfseries,
+    stringstyle=\color{orange!80!black},
+    commentstyle=\color{teal!70!black}\itshape,
+    emph={clean_text,text,re,BeautifulSoup},
+    emphstyle=\color{blue!70!black}\bfseries,
+    backgroundcolor=\color{gray!5},
+    frame=single,
+    rulecolor=\color{gray!20},
+    numbers=left,
+    numberstyle=\tiny\color{gray!60},
+    stepnumber=1,
+    numbersep=8pt,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    showstringspaces=false
+}
+
+\renewcommand{\contentsname}{MỤC LỤC}
+\renewcommand{\listfigurename}{DANH MỤC HÌNH ẢNH}
+\renewcommand{\listtablename}{DANH MỤC BẢNG}
+\renewcommand{\bibname}{TÀI LIỆU THAM KHẢO}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    {\large BỘ GIÁO DỤC VÀ ĐÀO TẠO\par}
+    \vspace{0.3cm}
+    {\large TRƯỜNG ĐẠI HỌC ...\par}
+    \vspace{2cm}
+    {\Large \textbf{BÁO CÁO ĐỒ ÁN}\par}
+    \vspace{1.5cm}
+    {\LARGE \textbf{XÂY DỰNG HỆ THỐNG}\\
+    \vspace{0.3cm}
+    \textbf{PHÁT HIỆN BÀI BÁO TIẾNG VIỆT DO AI TẠO RA}\par}
+    \vfill
+    \begin{flushleft}
+        \textbf{Sinh viên:} Nguyễn Hồ Giang Long\\
+        \textbf{MSSV:} 2351010115\\
+        \textbf{Giảng viên hướng dẫn:} Hồ Hướng Thiên
+    \end{flushleft}
+    \vfill
+    TP. Hồ Chí Minh, 2026
+\end{titlepage}
+
+\pagenumbering{roman}
+
+\chapter*{LỜI CẢM ƠN}
+Nội dung lời cảm ơn của sinh viên được trình bày tại đây.
+\addcontentsline{toc}{chapter}{LỜI CẢM ƠN}
+
+\chapter*{NHẬN XÉT CỦA GIẢNG VIÊN HƯỚNG DẪN}
+\vspace{8cm}
+\addcontentsline{toc}{chapter}{NHẬN XÉT CỦA GIẢNG VIÊN HƯỚNG DẪN}
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+\chapter*{DANH MỤC TỪ VIẾT TẮT}
+\begin{tabular}{>{\bfseries}p{3cm}p{10cm}}
+    AI & Artificial Intelligence - Trí tuệ nhân tạo \\
+    API & Application Programming Interface \\
+    BERT & Bidirectional Encoder Representations from Transformers \\
+    LLM & Large Language Model \\
+    XAI & Explainable Artificial Intelligence
+\end{tabular}
+\addcontentsline{toc}{chapter}{DANH MỤC TỪ VIẾT TẮT}
+
+\chapter*{MỞ ĐẦU}
+\addcontentsline{toc}{chapter}{MỞ ĐẦU}
+\textbf{Lý do chọn đề tài:} Trình bày sự phát triển của nội dung do AI tạo ra và nhu cầu phát hiện văn bản AI tiếng Việt.
+
+\textbf{Mục tiêu:} Xây dựng mô hình phân loại văn bản Human/AI và tích hợp mô hình vào một hệ thống web có khả năng giải thích kết quả.
+
+\textbf{Đối tượng và phạm vi:} Văn bản tiếng Việt, ưu tiên nội dung IT/news; hệ thống gồm pipeline dữ liệu, mô hình BamiBERT, API và giao diện web.
+
+\textbf{Phương pháp:} Thu thập dữ liệu, tiền xử lý, fine-tuning, đánh giá thực nghiệm và triển khai ứng dụng.
+
+\textbf{Bố cục báo cáo:} Báo cáo gồm 5 chương nội dung, từ giới thiệu đề tài, cơ sở lý thuyết và dữ liệu đến đánh giá mô hình, triển khai hệ thống và phương hướng phát triển.
+
+\clearpage
+\pagenumbering{arabic}
+
+\input{chapter1}
+\input{chapter2}
+\input{chapter3}
+\input{chapter4}
+\input{chapter5}
+
+\chapter*{TÀI LIỆU THAM KHẢO}
+\addcontentsline{toc}{chapter}{TÀI LIỆU THAM KHẢO}
+\begin{enumerate}
+    \item Tài liệu BamiBERT và mô hình BERT tiếng Việt.
+    \item Tài liệu PyTorch và Hugging Face Transformers.
+    \item Tài liệu Captum về Integrated Gradients.
+    \item Tài liệu FastAPI, React và Docker.
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,58 @@
+% !TeX root = main.tex
+
+% !TEX root = main.tex
+\chapter{GIỚI THIỆU ĐỀ TÀI}
+
+\section{Lý do chọn đề tài}
+Trong bối cảnh hiện nay, sự bùng nổ và phát triển một cách chóng mặt của các mô hình ngôn ngữ lớn (Large Language Models - LLM) như ChatGPT, Claude, Gemini,\dots đã và đang làm thay đổi trong việc tạo ra và tiếp cận thông tin. Các mô hình này
+có khả năng tạo ra những bài báo, văn bản hay tin tức một cách nhanh chóng và cách diễn đạt ngày càng tự nhiên, mạch lạc hơn, tức là ngày càng giống như con người viết. Điều này vô tình dẫn đến việc phân biệt nội dung giữa con người hay AI tạo ra
+ngày càng khó hơn. Điều này làm tăng nhu cầu phát triển và gia tăng các phương pháp, hệ thống có khả năng phát hiện nội dung do AI tạo ra.
+
+\vspace{\baselineskip}
+\noindent Tuy nhiên, hiện nay, có một số nhóm người lại lợi dụng các mô hình ngôn ngữ lớn đó để tạo ra các bài báo, tin tức nhằm phát tán thông tin sai lệch, gây hoang mang dư luận, và sử dụng các bài báo từ nguồn khác để tạo ra các bài báo mới bằng 
+cách viết, diễn đạt lại nội dung, lấy chất xám của người khác để tạo ra các sản phẩm cho riêng mình với mục đích khác. Ngoài ra, phần lớn các nghiên cứu và công cụ phát hiện văn bản do AI tạo ra hiện nay chỉ tập trung nhiều vào tiếng Anh, trong khi đó, các 
+bài báo tiếng Việt vẫn chưa được quan tâm đúng mức.  
+
+\vspace{\baselineskip}
+\noindent Để góp phần giải quyết các vấn đề trên, em đã lựa chọn đề tài \textbf{“Phát hiện văn bản do AI tạo ra và viết lại"}, tập trung vào các bài báo, tin tức tiếng Việt về lĩnh vực công nghệ thông tin (IT), các thiết bị công nghệ hiện đại, AI,\dots Lý do chọn lĩnh vực đây là vì
+em nghĩ đây là một lĩnh vực có nhiều thông tin, kiến thức mới được cập nhật liên tục và phát triển rất nhanh, có sự thay đổi thuật ngữ, từ vựng và cách diễn đạt liên tục, tạo ra một thách thức nhất định đối với bài toán phát hiện các văn bản do AI tạo ra. Qua đó, góp phần hỗ trợ quá
+trình đánh giá và kiểm chứng nguồn gốc thông tin trên môi trường số. 
+
+\section{Mục tiêu nghiên cứu}
+Mục tiêu chính của đề tài là xây dựng một hệ thống có khả năng phát hiện các bài báo, văn bản do AI tạo ra hay người viết dựa trên kiến trúc mô hình BamiBert, đồng thời cũng đánh giá khả năng nhận diện nội dung tạo ra hay là viết lại bằng AI.
+Bên cạnh khả năng phân loại, hệ thống còn hỗ trợ khả năng xác định mức độ đóng góp từng từ dựa vào kết quả dự đoán bằng thuật toán diễn giải mô hình (Explainable AI) Integrated Gradients và khả năng diễn giải kết quả bằng ngôn ngữ tự nhiên thông qua
+API của Gemini. Hệ thống được triển khai dưới dạng web app, một giao diện tương tác người dùng thân thiện được thiết kế để người dùng có thể tương tác với hệ thống một cách dễ dàng.
+
+\section{Đối tượng nghiên cứu}
+Đối tượng nghiên cứu bao gồm:
+
+\vspace{\baselineskip}
+\noindent \textbf{Các bài báo do con người viết và AI tạo ra, viết lại:} Các bài báo, tin tức chuyên về lĩnh vực công nghệ thông tin, AI, công nghệ hiện đại,\dots được thu thập từ các nguồn uy tín, rõ ràng.
+
+\vspace{\baselineskip}
+\noindent \textbf{Các phương pháp và mô hình học sâu cho bài toán phân loại văn bản:} Nghiên cứu các mô hình học sâu xử lý các đặc trưng ngôn ngữ và phương pháp học biểu diễn văn bản tiếng Việt nhằm phân biệt nội dung
+con người hay AI tạo ra, viết lại.
+
+\vspace{\baselineskip}
+\noindent \textbf{Phương pháp diễn giải mô hình (Explainable AI):} Nghiên cứu các phương pháp nhằm diễn giải kết quả dự đoán của mô hình học sâu, giải thích được mức độ đóng góp từng từ cho kết quả dự đoán.
+
+\vspace{\baselineskip}
+\noindent \textbf{Sử dụng API của Gemini:} Nghiên cứu khả năng diễn giải kết quả dự đoán bằng ngôn ngữ tự nhiên với một số ràng buộc nhất định.
+
+\vspace{\baselineskip}
+\noindent \textbf{Triển khai hệ thống web app:} Xây dựng một hệ thống đơn giản, dễ sử dụng, dữ liệu được lưu trữ bằng SQLite, triển khai trên Docker.
+
+\section{Bố cục đề tài}
+Chương 1: Giới thiệu đề tài 
+
+\vspace{\baselineskip}
+\noindent Chương 2: Các công nghệ và cơ sở lý thuyết 
+
+\vspace{\baselineskip}
+\noindent Chương 3: Dữ liệu, phương pháp xây dựng hệ thống
+
+\vspace{\baselineskip}
+\noindent Chương 4: Thực nghiệm và đánh giá hệ thống
+
+\vspace{\baselineskip}
+\noindent Chương 5: Kết luận và phương hướng phát triển hệ thống trong tương lai
