@@ -1,0 +1,23 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {listing}{\numberline {1}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Hàm làm sạch dữ liệu}}{20}{listing.3.1}%
+\contentsline {listing}{\numberline {2}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Định nghĩa bộ token hóa BamiBERT}}{20}{listing.3.2}%
+\contentsline {listing}{\numberline {3}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Thực hiện token hóa văn bản}}{21}{listing.3.3}%
+\contentsline {listing}{\numberline {4}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Định nghĩa mô hình phân loại}}{23}{listing.3.4}%
+\contentsline {listing}{\numberline {5}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Định nghĩa tham số mô hình}}{24}{listing.3.5}%
+\contentsline {listing}{\numberline {6}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Công thức CrossEntropy}}{24}{listing.3.6}%
+\contentsline {listing}{\numberline {7}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Thuật toán AdamW}}{24}{listing.3.7}%
+\contentsline {listing}{\numberline {8}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Huấn luyện mô hình}}{25}{listing.3.8}%
+\contentsline {listing}{\numberline {9}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Đánh giá mô hình}}{26}{listing.3.9}%
+\contentsline {listing}{\numberline {10}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Vòng lặp fine-tuning}}{27}{listing.3.10}%
+\contentsline {listing}{\numberline {11}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Khởi tạo \texttt {LayerIntegratedGradients}}}{31}{listing.3.11}%
+\contentsline {listing}{\numberline {12}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Chuẩn bị đầu vào và baseline cho quá trình tính attribution}}{31}{listing.3.12}%
+\contentsline {listing}{\numberline {13}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Thực hiện tính attribution}}{31}{listing.3.13}%
+\contentsline {listing}{\numberline {14}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Tổng hợp và chuẩn hóa giá trị attribution}}{32}{listing.3.14}%
+\contentsline {listing}{\numberline {15}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Tổng hợp và chuẩn hóa giá trị attribution}}{32}{listing.3.15}%
+\contentsline {listing}{\numberline {16}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Ánh xạ giá trị token sang từ/cụm từ}}{33}{listing.3.16}%
+\contentsline {listing}{\numberline {17}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Lọc các token có attribution lớn nhất và tính các giá trị định lượng}}{33}{listing.3.17}%
+\addvspace {10\p@ }
+\contentsline {listing}{\numberline {18}{\ignorespaces \xpg@aux {}{vietnamese}\ignorespaces Prompt để sinh giải thích bằng LLM}}{45}{listing.4.18}%
+\addvspace {10\p@ }

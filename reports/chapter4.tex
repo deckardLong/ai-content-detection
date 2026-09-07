@@ -119,13 +119,15 @@ Sau đây là kết quả attribution score của các token tương ứng với
 \subsection{Thiết lập sinh giải thích}
 \begin{Verbatim}[fontsize=\small, frame=single, rulecolor=\color{gray!20}, formatcom=\color{black}]
 PROMPT_TEMPLATE = """
-Bạn là trợ lý giải thích kết quả của một mô hình phát hiện văn bản AI tiếng Việt.
+Bạn là trợ lý giải thích kết quả của một mô hình phát hiện văn bản AI 
+tiếng Việt.
 Model đã dự đoán: {predicted_class} (xác suất {pred_prob:.1%}).
 
 Bằng chứng đã tính được (KHÔNG được suy đoán thêm ngoài các số liệu này):
 - Từ ảnh hưởng mạnh nhất ủng hộ AI: {top_ai_words}
 - Từ ảnh hưởng mạnh nhất ủng hộ Human: {top_human_words}
-- Số câu: {sentence_count}, độ dài câu trung bình: {avg_sentence_length:.1f} từ, độ lệch chuẩn: {sentence_length_std:.1f}
+- Số câu: {sentence_count}, độ dài câu trung bình: {avg_sentence_length:.1f} 
+từ, độ lệch chuẩn: {sentence_length_std:.1f}
 - Mật độ dấu câu: {punctuation_density:.3f}
 
 Trả lời CHÍNH XÁC theo định dạng dưới đây, MỖI BULLET TRÊN MỘT DÒNG MỚI:
@@ -134,7 +136,8 @@ Trả lời CHÍNH XÁC theo định dạng dưới đây, MỖI BULLET TRÊN M�
 - Giải thích thứ ba
 (và cứ như vậy, tối đa 5 bullet)
 
-Giải thích vì sao văn bản có đặc điểm trên, CHỈ dựa trên các số liệu đã cho, không thêm thông tin ngoài dữ liệu này.
+Giải thích vì sao văn bản có đặc điểm trên, CHỈ dựa trên các số liệu đã cho, 
+không thêm thông tin ngoài dữ liệu này.
 """
 \end{Verbatim}
 \captionof{listing}{Prompt để sinh giải thích bằng LLM}

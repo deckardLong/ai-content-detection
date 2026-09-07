@@ -16,6 +16,7 @@
 \usepackage{amsmath}
 \usepackage{float}
 \usepackage{caption}
+\usepackage{enumitem}
 \usepackage{chngcntr}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning}
@@ -72,7 +73,7 @@
     \centering
     {\large BỘ GIÁO DỤC VÀ ĐÀO TẠO\par}
     \vspace{0.3cm}
-    {\large TRƯỜNG ĐẠI HỌC ...\par}
+    {\large TRƯỜNG ĐẠI HỌC MỞ THÀNH PHỐ HỒ CHÍ MINH\par}
     \vspace{2cm}
     {\Large \textbf{BÁO CÁO ĐỒ ÁN}\par}
     \vspace{1.5cm}
@@ -92,7 +93,22 @@
 \pagenumbering{roman}
 
 \chapter*{LỜI CẢM ƠN}
-Nội dung lời cảm ơn của sinh viên được trình bày tại đây.
+Lời đầu tiên em xin bày tỏ lòng biết ơn sâu sắc nhất đến với thầy Hồ Hướng Thiên, người đã bỏ ra rất nhiều thời gian để tận tình giới thiệu, hướng dẫn, truyền đạt kiến thức, chỉnh sửa
+và góp ý đề tài đồ án "Xây Dựng Hệ Thống Phát Hiện Bài Báo Tiếng Việt do AI Tạo Ra". Những định hướng và lời khuyên chuyên môn của thầy không những giúp em vượt qua khó khăn về mặt kĩ thuật
+mà còn mở rộng tầm nhìn về tiềm năng ứng dụng của đồ án này trong thực tế lĩnh vực Trí Tuệ Nhân Tạo và Xử Lý Ngôn Ngữ Tự Nhiên. Thông qua quá trình thực hiện, em đã có cơ hội vận dụng kiến thức
+đã học trong việc thu thập, xử lý dữ liệu, xây dựng mô hình để giải quyết yêu cầu bài toán cũng như xây dựng và triển khai thành một sản phẩm có thể triển khai thực tế. 
+
+\vspace{\baselineskip}
+\noindent
+Ngoài ra, em cũng xin gửi lời cảm ơn đến các giảng viên Khoa Công Nghệ Thông Tin đã cung cấp những kiến thức nền tảng vững chắc, đóng vai trò quan trọng trong việc dẫn dắt để em tiếp cận và giải 
+quyết các vấn đề của đề tài. Mặc dù đã có rất nhiều cố gắng, tuy nhiên đề tài em làm chắc chắn sẽ có những sai sót. Vì vậy, em rất mong nhận được những ý kiến đóng góp quý báu của thầy cô và người đọc
+để đề tài hoàn thiện và cải tiến hơn trong tương lai.
+
+\vspace{\baselineskip}
+\noindent
+Cuối cùng, em xin chúc các thầy cô Khoa Công Nghệ Thông Tin thật nhiều sức khỏe, hạnh phúc và thành công trong công tác giảng dạy và nghiên cứu. Em xin chân thành cảm ơn thầy Hồ Hướng Thiên đã tận tình hướng dẫn,
+hỗ trợ em suốt quá trình làm và thực hiện đồ án.
+
 \addcontentsline{toc}{chapter}{LỜI CẢM ƠN}
 
 \chapter*{NHẬN XÉT CỦA GIẢNG VIÊN HƯỚNG DẪN}
@@ -102,28 +118,64 @@ Nội dung lời cảm ơn của sinh viên được trình bày tại đây.
 \tableofcontents
 \listoffigures
 \listoftables
+\renewcommand{\listlistingname}{DANH MỤC ĐOẠN MÃ NGUỒN}
+\listoflistings
+\addcontentsline{toc}{chapter}{DANH MỤC ĐOẠN MÃ NGUỒN}
 
 \chapter*{DANH MỤC TỪ VIẾT TẮT}
-\begin{tabular}{>{\bfseries}p{3cm}p{10cm}}
-    AI & Artificial Intelligence - Trí tuệ nhân tạo \\
-    API & Application Programming Interface \\
-    BERT & Bidirectional Encoder Representations from Transformers \\
-    LLM & Large Language Model \\
-    XAI & Explainable Artificial Intelligence
-\end{tabular}
+\begin{center}
+    \small
+    \renewcommand{\arraystretch}{0.95}
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{>{\centering\arraybackslash}p{0.7cm}>{\bfseries\centering\arraybackslash}p{1.8cm}>{\raggedright\arraybackslash}p{5.3cm}>{\raggedright\arraybackslash}p{6.5cm}}
+        \toprule
+        STT & Từ viết tắt & Từ đầy đủ & Ý nghĩa \\
+        \midrule
+        1 & AI & Artificial Intelligence & Trí tuệ nhân tạo. \\
+        2 & API & Application Programming Interface & Giao diện lập trình ứng dụng. \\
+        3 & AUC & Area Under the Curve & Diện tích dưới đường cong, dùng để đánh giá khả năng phân loại. \\
+        4 & BBPE & Byte-level Byte Pair Encoding & Thuật toán tách từ dựa trên cặp byte ở cấp độ byte. \\
+        5 & BERT & Bidirectional Encoder Representations from Transformers & Mô hình biểu diễn ngôn ngữ hai chiều dựa trên Transformer. \\
+        6 & CE & Cross-Entropy & Hàm mất mát entropy chéo dùng trong phân loại. \\
+        7 & CLS & Classification & Token đặc biệt đại diện cho toàn bộ chuỗi đầu vào. \\
+        8 & CPU & Central Processing Unit & Bộ xử lý trung tâm của máy tính. \\
+        9 & FN & False Negative & Số mẫu dương bị dự đoán nhầm thành âm. \\
+        10 & FP & False Positive & Số mẫu âm bị dự đoán nhầm thành dương. \\
+        11 & GPT & Generative Pre-trained Transformer & Mô hình Transformer sinh văn bản, được tiền huấn luyện. \\
+        12 & HTML & HyperText Markup Language & Ngôn ngữ đánh dấu siêu văn bản. \\
+        13 & IG & Integrated Gradients & Thuật toán tính mức độ đóng góp của từng đặc trưng đầu vào. \\
+        14 & IT & Information Technology & Công nghệ thông tin. \\
+        15 & KDE & Kernel Density Estimate & Phương pháp ước lượng mật độ xác suất của dữ liệu. \\
+        16 & LLM & Large Language Model & Mô hình ngôn ngữ lớn có khả năng xử lý và sinh văn bản. \\
+        17 & LSTM & Long Short-Term Memory & Mạng nơ-ron hồi quy có khả năng ghi nhớ thông tin dài hạn. \\
+        18 & MLM & Masked Language Modeling & Nhiệm vụ dự đoán các token bị che trong quá trình tiền huấn luyện. \\
+        19 & NLP & Natural Language Processing & Xử lý ngôn ngữ tự nhiên. \\
+        20 & PR-AUC & Precision-Recall Area Under the Curve & Diện tích dưới đường cong Precision-Recall. \\
+        21 & Q/K/V & Query/Key/Value & Ba thành phần dùng để tính cơ chế tự chú ý trong Transformer. \\
+        22 & RNN & Recurrent Neural Network & Mạng nơ-ron hồi quy xử lý dữ liệu tuần tự. \\
+        23 & ROC & Receiver Operating Characteristic & Đường cong biểu diễn quan hệ giữa tỷ lệ dương thật và tỷ lệ dương giả. \\
+        24 & TF-IDF & Term Frequency-Inverse Document Frequency & Trọng số từ dựa trên tần suất xuất hiện trong văn bản và toàn bộ tập dữ liệu. \\
+        25 & TP & True Positive & Số mẫu dương được dự đoán đúng. \\
+        26 & URL & Uniform Resource Locator & Địa chỉ định vị tài nguyên trên Internet. \\
+        27 & XAI & Explainable Artificial Intelligence & Trí tuệ nhân tạo có khả năng giải thích. \\
+        \bottomrule
+    \end{tabular}
+\end{center}
 \addcontentsline{toc}{chapter}{DANH MỤC TỪ VIẾT TẮT}
 
 \chapter*{MỞ ĐẦU}
-\addcontentsline{toc}{chapter}{MỞ ĐẦU}
-\textbf{Lý do chọn đề tài:} Trình bày sự phát triển của nội dung do AI tạo ra và nhu cầu phát hiện văn bản AI tiếng Việt.
+Trong những năm gần đây, sự xuất hiện và phát triển của trí tuệ nhân tạo AI đã góp phần lớn trong cái cách mà con người tạo ra, xử lý và tiếp cận thông tin. Hơn hết là khả năng
+tạo các nội dung từ các công cụ AI ngày càng được phát triển và cải thiện hơn bao giờ hết, mang lại nhiều tiện tích trong quá trình học tập, nghiên cứu, truyển thông và sản xuất nội
+dung. Tuy nhiên, khi nội dung do AI tạo ra ngày càng nhiều và phổ biến, việc xác định văn bản được viết hoàn toàn bởi con người, được tạo ra bởi AI hay là có sự can thiệp bởi AI ngày
+càng trở nên khó khăn hơn. Điều này đặc biệt đáng lo đối với môi trường Internet hiện nay, xuất hiện không ít các tin tức do AI tạo ra không rõ nguồn gốc hay là không đủ thông tin để
+xác định nguồn. Do đó, việc nghiên cứu các phương pháp hỗ trợ nhận diện văn bản do AI tạo nên góp phần cung cấp một cơ sở tham khảo trong môi trường số.
 
-\textbf{Mục tiêu:} Xây dựng mô hình phân loại văn bản Human/AI và tích hợp mô hình vào một hệ thống web có khả năng giải thích kết quả.
-
-\textbf{Đối tượng và phạm vi:} Văn bản tiếng Việt, ưu tiên nội dung IT/news; hệ thống gồm pipeline dữ liệu, mô hình BamiBERT, API và giao diện web.
-
-\textbf{Phương pháp:} Thu thập dữ liệu, tiền xử lý, fine-tuning, đánh giá thực nghiệm và triển khai ứng dụng.
-
-\textbf{Bố cục báo cáo:} Báo cáo gồm 5 chương nội dung, từ giới thiệu đề tài, cơ sở lý thuyết và dữ liệu đến đánh giá mô hình, triển khai hệ thống và phương hướng phát triển.
+\vspace{\baselineskip}
+\noindent
+Xuất phát từ những vấn đề trên, trong đồ án này em đã tập trung xây dựng hệ thống Phát Hiện Bài Báo Tiếng Việt Do AI Tạo Ra với phạm vi dữ liệu hướng đến các bài báo liên quan đến lĩnh vực
+Công Nghệ Thông Tin. Đồ án này tiếp cận người dùng bằng cách nhận văn bản từ họ, tiến hành phân tích đưa ra kết quả dự đoán cũng như lời giải thích. Hệ thống này không chỉ tập trung phân biệt các văn 
+bản do AI tạo ra hoàn toàn với người viết mà còn tập trung vào một trường hợp đó là sử dụng AI để thay đổi hay viết lại nội dung từ văn bản con người. Qua đó, bài toán được tiếp cận theo hướng đa dạng hơn
+thay vì giới hạn hoàn toàn những văn bản được tạo hoàn toàn bởi AI.
 
 \clearpage
 \pagenumbering{arabic}
@@ -136,11 +188,12 @@ Nội dung lời cảm ơn của sinh viên được trình bày tại đây.
 
 \chapter*{TÀI LIỆU THAM KHẢO}
 \addcontentsline{toc}{chapter}{TÀI LIỆU THAM KHẢO}
-\begin{enumerate}
-    \item Tài liệu BamiBERT và mô hình BERT tiếng Việt.
-    \item Tài liệu PyTorch và Hugging Face Transformers.
-    \item Tài liệu Captum về Integrated Gradients.
-    \item Tài liệu FastAPI, React và Docker.
+\begin{enumerate}[label={[\arabic*]}, leftmargin=1.2cm, labelsep=0.3cm, itemsep=0.45\baselineskip, topsep=0.2\baselineskip, parsep=0pt]
+    \item D. Q. Nguyen, T. Pham, C. Tran, and L. T. Nguyen, “BamiBERT: A new BERT-based language model for Vietnamese,” arXiv preprint arXiv:2607.02259, 2026.
+    \item H. Moraliyage, H. Kulawardana, G. De Silva, Z. Issadeen, M. Manic, and S. Katsura, “Explainable artificial intelligence with integrated gradients for the detection of adversarial attacks on text classifiers,” Applied System Innovation, vol. 8, no. 1, Art. no. 17, 2025.
+    \item J. Wu et al., “A Survey on LLM-Generated Text Detection: Necessity, Methods, and Future Directions,” Computational Linguistics, 2025.
+    \item T. Kehkashan et al., “AI-generated text detection: A comprehensive review of methods, datasets, and applications,” Computer Science Review, vol. 58, Art. no. 100793, 2025.
+    \item “Understanding the effects of human-written paraphrases in LLM-generated text detection,” Natural Language Processing Journal, vol. 11, Art. no. 100151, 2025.
 \end{enumerate}
 
 \end{document}
