@@ -26,7 +26,7 @@ class AttributionExplainer:
         # Step 1: Get attribution at syllable level (as usual)
         encoding = self.tokenizer(
             text, max_length=self.max_length, truncation=True,
-            padding='max_length', return_tensors='pt',
+            padding=True, return_tensors='pt',
             return_offsets_mapping=True # return position of each token
         )
         input_ids = encoding['input_ids'].to(self.device)
@@ -44,7 +44,8 @@ class AttributionExplainer:
         attributions, delta = self.lig.attribute(
             inputs=input_ids, baselines=baseline_ids,
             additional_forward_args=(attention_mask,),
-            target=target_label, return_convergence_delta=True, n_steps=n_steps
+            target=target_label, return_convergence_delta=True, n_steps=n_steps,
+            internal_batch_size=1
         )
         attributions = attributions.sum(dim=-1).squeeze(0)
         attributions = attributions / (torch.norm(attributions) + 1e-10) # keep in stable range

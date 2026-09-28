@@ -38,7 +38,7 @@ def predict_single_text(model, tokenizer, text, device, max_length=512, clean=Tr
     model.eval()
     encoding = tokenizer(
         processed_text, max_length=max_length, truncation=True,
-        padding='max_length', return_tensors='pt'
+        padding=True, return_tensors='pt'
     )
     input_ids = encoding['input_ids'].to(device)
     attention_mask = encoding['attention_mask'].to(device)
