@@ -1,4 +1,5 @@
 import logging
+from threading import Lock
 import torch
 from transformers import AutoTokenizer
 from src.training.model import AIContentModel
@@ -22,6 +23,7 @@ class ModelService:
         self.tokenizer = None
         self.model = None
         self.explainer = None
+        self._explain_lock = Lock()
 
     def load(self):
         logger.info('Loading tokenizer: %s', self.settings.model_name)
@@ -47,9 +49,10 @@ class ModelService:
     def explain(self, text):
         if self.explainer is None:
             raise RuntimeError('Model chưa được load')
-        result = self.explainer.explain(
-            text, target_label=AL_LABEL, n_steps=self.settings.ig_n_steps
-        )
+        with self._explain_lock:
+            result = self.explainer.explain(
+                text, target_label=AL_LABEL, n_steps=self.settings.ig_n_steps
+            )
 
         return {
             'tokens': result['tokens'],
