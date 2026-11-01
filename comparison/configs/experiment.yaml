@@ -1,0 +1,41 @@
+# Common configuration
+seed: 42
+data_path: ../data/it_ai_human_data.csv   # relative to comparison/
+text_col: text
+n_folds: 5            # StratifiedGroupKFold: every sample is tested exactly once
+max_length: 256       # same token budget for both encoders (PhoBERT max = 256)
+num_classes: 2
+dropout: 0.1
+
+# frozen   : PhoBERT/BamiBERT only extract features (frozen), only the DL head is trained
+# finetune : train encoder + head end-to-end
+mode: frozen
+
+# epochs = max epochs; early stopping on val macro-F1 after `patience` epochs without improvement
+frozen:
+  batch_size: 32
+  epochs: 10
+  patience: 3
+  lr_head: 1.0e-3
+
+finetune:
+  batch_size: 16
+  epochs: 10
+  patience: 3
+  lr_encoder: 2.0e-5
+  lr_head: 1.0e-3
+  warmup_ratio: 0.1
+
+# Choose PhoBERT + BamiBERT as encoders
+encoders:
+  phobert: vinai/phobert-base
+  bamibert: Qualcomm-AI-Research/BamiBERT
+
+# Choose CNN + BiLSTM as CLS
+heads:
+  cnn:
+    num_filters: 128
+    kernel_sizes: [2, 3, 4]
+  bilstm:
+    lstm_hidden: 128
+    num_layers: 1
