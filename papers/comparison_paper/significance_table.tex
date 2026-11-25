@@ -1,0 +1,19 @@
+\begin{table}[ht]
+\centering
+\caption{Kiểm định McNemar trên dự đoán out-of-fold gộp (hiệu chỉnh Holm)}
+\label{tab:frozen_equal_text-significance}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llcccc}
+\hline
+Mô hình A & Mô hình B & Chỉ A đúng & Chỉ B đúng & $p_{\mathrm{Holm}}$ & Ý nghĩa \\
+\hline
+BamiBERT + BiLSTM & BamiBERT + CNN & 70 & 276 & <0.001 & Có \\
+BamiBERT + BiLSTM & PhoBERT + BiLSTM & 205 & 170 & 0.079 & Không \\
+BamiBERT + BiLSTM & PhoBERT + CNN & 87 & 264 & <0.001 & Có \\
+BamiBERT + CNN & PhoBERT + BiLSTM & 321 & 80 & <0.001 & Có \\
+BamiBERT + CNN & PhoBERT + CNN & 90 & 61 & 0.045 & Có \\
+PhoBERT + BiLSTM & PhoBERT + CNN & 74 & 286 & <0.001 & Có \\
+\hline
+\end{tabular}%
+}
+\end{table}

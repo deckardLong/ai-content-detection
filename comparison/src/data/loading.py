@@ -10,6 +10,12 @@ def clean_text(text):
     text = re.sub(r'\s+', ' ', text).strip()
     return text
 
+def truncate_syllables(text, n):
+    """Keep the first n syllables (whitespace tokens) so every encoder sees exactly the same text."""
+    if not n:
+        return text
+    return ' '.join(text.split()[:n])
+
 def build_groups(df):
     """A rewritten article shares the group of its original human article (matched by url,
     falling back to original_text), so a pair never ends up split across train and test."""

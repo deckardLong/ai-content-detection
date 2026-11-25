@@ -1,0 +1,243 @@
+% Compile with XeLaTeX (same setup as reports/main.tex):  xelatex main.tex  (run twice)
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage{vietnamese}
+\setmainfont{Times New Roman}
+
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\AtBeginDocument{\renewcommand{\figurename}{Hình}\renewcommand{\tablename}{Bảng}}
+
+% Dùng \todo{...} để đánh dấu chỗ cần viết / kiểm tra; xóa khi xong.
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+% Hình: nếu chưa có file thì hiện khung giữ chỗ
+\newcommand{\figureordummy}[3]{% file, width, placeholder text
+  \IfFileExists{#1}{\includegraphics[width=#2]{#1}}{\fbox{\parbox{#2}{\centering\vspace{2cm}#3\vspace{2cm}}}}}
+
+\title{\textbf{TODO: Tên bài báo}\\[2pt]
+       \large TODO: English title}
+\author{Nguyễn Hồ Giang Long \\
+        \small \todo{đơn vị} \\
+        \small \todo{email}}
+\date{}
+
+\begin{document}
+\maketitle
+
+% =====================================================================
+\begin{abstract}
+% Gợi ý (4--6 câu): bối cảnh/vấn đề -> việc đã làm (so sánh có kiểm soát PhoBERT vs BamiBERT,
+% đặc trưng đóng băng, CNN/BiLSTM) -> kết quả chính (con số) -> ý nghĩa.
+\todo{Tóm tắt}
+
+\medskip
+\noindent\textbf{Từ khóa:} \todo{phát hiện văn bản AI; tiếng Việt; PhoBERT; BamiBERT; đặc trưng đóng băng}
+\end{abstract}
+
+% =====================================================================
+\section{Giới thiệu}
+\label{sec:intro}
+% - Bối cảnh: LLM sinh văn bản tiếng Việt, rủi ro, nhu cầu phát hiện
+% - Khoảng trống: thiếu so sánh có kiểm soát giữa các encoder tiếng Việt cho bài toán này
+% - Câu hỏi nghiên cứu (RQ1, RQ2, ...)
+% - Đóng góp (gạch đầu dòng)
+% - Bố cục các phần còn lại
+\todo{Giới thiệu}
+
+\paragraph{Đóng góp.}
+\begin{itemize}
+  \item \todo{đóng góp 1}
+  \item \todo{đóng góp 2}
+  \item \todo{đóng góp 3}
+\end{itemize}
+
+% =====================================================================
+\section{Các nghiên cứu liên quan}
+\label{sec:related}
+
+\subsection{Phát hiện văn bản do AI tạo ra}
+% Các hướng: thống kê/zero-shot, bộ phân loại học có giám sát, dữ liệu tiếng Anh vs tiếng Việt
+\todo{}
+
+\subsection{Mô hình ngôn ngữ tiền huấn luyện cho tiếng Việt}
+% PhoBERT, BamiBERT (hạn chế của PhoBERT mà BamiBERT hướng tới)
+\todo{}
+
+\subsection{Đặc trưng đóng băng và fine-tuning}
+% Encoder đóng băng + head nhẹ (CNN/BiLSTM) so với fine-tune toàn bộ
+\todo{}
+
+% =====================================================================
+\section{Phương pháp}
+\label{sec:method}
+% Tổng quan pipeline (lưu đồ), rồi từng bước. Chi tiết dữ liệu để ở Mục 4.
+
+\begin{figure}[t]
+  \centering
+  \figureordummy{fig_overview.png}{0.95\linewidth}{Lưu đồ tổng quan phương pháp (đặt file \texttt{fig\_overview.png})}
+  \caption{Tổng quan phương pháp: \todo{mô tả}.}
+  \label{fig:overview}
+\end{figure}
+
+\subsection{Tổng quan quy trình}
+\todo{Mô tả Hình \ref{fig:overview}}
+
+\subsection{Cắt văn bản theo số âm tiết để hai encoder đọc cùng nội dung}
+% Cắt 225 âm tiết đầu trước khi tokenize; vì sao không cố định số token
+\todo{}
+
+\subsection{Tokenizer và trích xuất đặc trưng (encoder đóng băng)}
+% Tách từ (underthesea) chỉ cho PhoBERT; max_length; last hidden state; cache
+\todo{}
+
+\subsection{Bộ phân loại (head)}
+\subsubsection{CNN}
+\todo{}
+\subsubsection{BiLSTM}
+\todo{}
+
+\subsection{Huấn luyện và chọn mô hình}
+% Hàm mất mát, optimizer, số epoch, chọn epoch theo tập validation
+\todo{}
+
+% =====================================================================
+\section{Bộ dữ liệu}
+\label{sec:dataset}
+
+\subsection{Thu thập dữ liệu}
+% Nguồn báo, ba loại: human / AI-generated / AI-rewritten, LLM dùng để sinh/viết lại
+\todo{}
+
+\subsection{Tiền xử lý}
+% Làm sạch HTML, chuẩn hóa khoảng trắng, ...
+\todo{}
+
+\subsection{Thống kê}
+\begin{table}[t]
+  \centering
+  \caption{Thống kê bộ dữ liệu theo loại văn bản.}
+  \label{tab:dataset}
+  \begin{tabular}{lccc}
+    \toprule
+    Loại & Số mẫu & Nhãn & Độ dài TB (âm tiết) \\
+    \midrule
+    Human         & \todo{} & \todo{} & \todo{} \\
+    AI-generated  & \todo{} & \todo{} & \todo{} \\
+    AI-rewritten  & \todo{} & \todo{} & \todo{} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Thiết lập thực nghiệm}
+\label{sec:setup}
+
+\subsection{Chia dữ liệu và đánh giá chéo}
+% 5-fold, chia theo nhóm (bài viết lại cùng nhóm với bài gốc), val tách từ train
+\todo{}
+
+\subsection{Chi tiết cài đặt}
+% Siêu tham số, phần cứng, thư viện
+\begin{table}[t]
+  \centering
+  \caption{Siêu tham số huấn luyện.}
+  \label{tab:hparams}
+  \begin{tabular}{ll}
+    \toprule
+    Tham số & Giá trị \\
+    \midrule
+    \todo{} & \todo{} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Độ đo đánh giá}
+% Accuracy, Precision, Recall, F1 của lớp AI (nhãn dương = 1)
+\todo{}
+
+\subsection{Kiểm định thống kê}
+% McNemar trên dự đoán out-of-fold gộp, hiệu chỉnh Holm
+\todo{}
+
+% =====================================================================
+\section{Kết quả}
+\label{sec:results}
+
+\subsection{So sánh hiệu năng tổng thể}
+Bảng~\ref{tab:frozen_equal_text-cv} trình bày kết quả đánh giá chéo 5-fold của bốn mô hình, trong đó lớp AI là lớp dương. Với cùng nội dung đầu vào (225 âm tiết đầu của mỗi bài), \textbf{BamiBERT + CNN} đạt kết quả cao nhất ở Accuracy (0.9542), Recall (0.9344) và F1 (0.9533). PhoBERT + CNN theo sát với Accuracy 0.9484 và F1 0.9469, và có Precision cao hơn một chút (0.9761 so với 0.9730). Độ lệch chuẩn giữa các fold của BamiBERT + CNN cũng nhỏ hơn (Accuracy $\pm 0.0042$ so với $\pm 0.0076$), cho thấy mô hình ổn định hơn khi đổi dữ liệu huấn luyện.
+
+\IfFileExists{main_table.tex}{\input{main_table.tex}}{\todo{chèn main\_table.tex}}
+
+Ảnh hưởng của loại bộ phân loại (head) lớn hơn nhiều so với ảnh hưởng của loại encoder. Với cả hai encoder, CNN vượt BiLSTM khoảng 4 điểm phần trăm Accuracy (PhoBERT: 0.9484 so với 0.9060; BamiBERT: 0.9542 so với 0.9130) và vượt rõ rệt ở ROC-AUC (Bảng~\ref{tab:frozen_equal_text-bytype}). Ngược lại, khi giữ nguyên head, việc đổi encoder từ PhoBERT sang BamiBERT chỉ cải thiện Accuracy khoảng 0.6 điểm (CNN) và 0.7 điểm (BiLSTM).
+
+\subsection{Kiểm định ý nghĩa thống kê}
+Để đánh giá các chênh lệch trên có đáng tin hay không, chúng tôi dùng kiểm định McNemar trên dự đoán out-of-fold gộp của 5 fold (5\,000 mẫu), hiệu chỉnh Holm cho 6 phép so sánh cặp (Bảng~\ref{tab:frozen_equal_text-significance}). Kết quả cho thấy:
+\begin{itemize}
+  \item Với head CNN, BamiBERT tốt hơn PhoBERT có ý nghĩa thống kê, nhưng sát ngưỡng ($p_{\mathrm{Holm}} = 0.045$; có 90 mẫu chỉ BamiBERT + CNN đoán đúng và 61 mẫu chỉ PhoBERT + CNN đoán đúng).
+  \item Với head BiLSTM, khác biệt giữa hai encoder \emph{chưa} có ý nghĩa thống kê ($p_{\mathrm{Holm}} = 0.079$).
+  \item CNN tốt hơn BiLSTM có ý nghĩa thống kê ở cả hai encoder ($p_{\mathrm{Holm}} < 0.001$).
+\end{itemize}
+Như vậy ưu thế của BamiBERT là có thật với CNN nhưng nhỏ, còn ưu thế của CNN so với BiLSTM thì rõ ràng và nhất quán.
+
+\IfFileExists{significance_table.tex}{\input{significance_table.tex}}{\todo{chèn significance\_table.tex}}
+
+\subsection{Phân tích theo loại văn bản}
+Bảng~\ref{tab:frozen_equal_text-bytype} tách độ chính xác theo ba loại văn bản. Lớp \emph{AI-generated} gần như đã bão hòa (0.9936 với cả hai mô hình CNN), và lớp \emph{Human} có độ chính xác tương đương giữa hai encoder (0.9772 so với 0.9740 với CNN; PhoBERT nhỉnh hơn một chút, khớp với Precision cao hơn ở Bảng~\ref{tab:frozen_equal_text-cv}). Toàn bộ khoảng cách giữa hai encoder nằm ở lớp \emph{AI-rewritten}, là lớp khó nhất: BamiBERT + CNN đạt 0.8752 so với 0.8456 của PhoBERT + CNN (+2.96 điểm), và BamiBERT + BiLSTM đạt 0.7920 so với 0.7528 của PhoBERT + BiLSTM (+3.92 điểm). Điều này giải thích vì sao BamiBERT có Recall cao hơn: nó bắt được nhiều văn bản AI viết lại hơn, mà không làm giảm đáng kể độ chính xác trên văn bản người viết. Đáng chú ý, ROC-AUC của hai encoder gần như bằng nhau (0.9894 so với 0.9887 với CNN), nghĩa là khả năng xếp hạng mẫu AI cao hơn mẫu người của hai encoder tương đương; phần khác biệt chủ yếu thể hiện ở độ chính xác tại ngưỡng quyết định 0.5.
+
+\IfFileExists{type_table.tex}{\input{type_table.tex}}{\todo{chèn type\_table.tex}}
+
+\subsection{Chi phí tính toán}
+Bảng~\ref{tab:frozen_equal_text-cv-time} so sánh thời gian chạy trên GPU RTX 2070 (8\,GB). Vì encoder được đóng băng, đặc trưng của mỗi encoder chỉ phải trích một lần và được dùng chung cho cả CNN và BiLSTM. BamiBERT chậm hơn PhoBERT khoảng 2.6 lần ở bước trích đặc trưng (104.97 s so với 40.95 s), và khoảng 2.1 lần (CNN) và 1.5 lần (BiLSTM) ở bước huấn luyện head trên mỗi fold. Nguyên nhân chính là với cùng 225 âm tiết, tokenizer của BamiBERT tạo chuỗi token dài hơn tokenizer của PhoBERT nên cần giới hạn độ dài 512 thay vì 256, làm tăng chi phí cả của encoder lẫn của head. Số epoch tốt nhất trung bình khá gần nhau (từ 11 đến 13) nên chênh lệch thời gian không đến từ việc huấn luyện nhiều epoch hơn. Tổng hợp lại, BamiBERT + CNN tăng khoảng 0.6 điểm Accuracy và 1.5 điểm Recall so với PhoBERT + CNN, đổi lại khoảng gấp đôi chi phí tính toán.
+
+\IfFileExists{time_table.tex}{\input{time_table.tex}}{\todo{chèn time\_table.tex}}
+
+\subsection{Đường cong mất mát}
+Hình~\ref{fig:loss} vẽ cross-entropy loss theo epoch (trung bình 5 fold, vùng mờ là $\pm 1$ độ lệch chuẩn). Loss trên tập huấn luyện của cả bốn mô hình giảm về gần 0 sau khoảng 9 đến 12 epoch, nghĩa là head có đủ khả năng ghi nhớ tập huấn luyện. Trong khi đó loss trên tập validation và test không giảm theo: với CNN, loss đạt thấp nhất ở các epoch đầu (khoảng epoch 2 đến 3) rồi tăng chậm và ổn định quanh 0.2; với BiLSTM, loss tăng liên tục từ khoảng 0.22 lên 0.45 đến 0.55, và có vùng dao động giữa các fold rộng hơn. Hai encoder có đường cong gần như trùng nhau khi dùng cùng một head, tức là hiện tượng quá khớp chủ yếu do head chứ không do encoder. Vì vậy chúng tôi không dùng mô hình ở epoch cuối mà giữ trọng số của epoch có macro-F1 trên tập validation cao nhất (trung bình ở epoch 11 đến 13); loss validation tăng có thể phản ánh mô hình quá tự tin ở một số mẫu sai chứ không nhất thiết làm giảm độ chính xác. Tập test trong hình chỉ dùng để vẽ, không tham gia chọn mô hình.
+
+\begin{figure}[t]
+  \centering
+  \figureordummy{fig_loss_cv.png}{\linewidth}{Đường cong loss}
+  \caption{Cross-entropy loss theo epoch trên tập huấn luyện, validation và test (trung bình 5 fold, vùng mờ là $\pm 1$ độ lệch chuẩn giữa các fold).}
+  \label{fig:loss}
+\end{figure}
+
+% =====================================================================
+\section{Thảo luận}
+\label{sec:discussion}
+
+\subsection{BamiBERT so với PhoBERT}
+\todo{}
+
+\subsection{CNN so với BiLSTM}
+\todo{}
+
+\subsection{Hạn chế}
+% Một lĩnh vực (tin công nghệ), LLM sinh dữ liệu, chỉ đặc trưng đóng băng, siêu tham số chưa tinh chỉnh riêng, ...
+\todo{}
+
+% =====================================================================
+\section{Kết luận}
+\label{sec:conclusion}
+% Tóm tắt kết quả chính + hướng phát triển
+\todo{}
+
+% =====================================================================
+\section*{Lời cảm ơn}
+\todo{(nếu có)}
+
+\begin{thebibliography}{99}
+% Ví dụ định dạng:
+% \bibitem{phobert} D.~Q. Nguyen and A.~T. Nguyen, ``PhoBERT: Pre-trained language models for Vietnamese,'' in \emph{Findings of EMNLP}, 2020.
+\bibitem{todo} \todo{thêm tài liệu tham khảo}
+\end{thebibliography}
+
+\end{document}

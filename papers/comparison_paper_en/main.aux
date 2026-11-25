@@ -1,0 +1,94 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand*\HyPL@Entry[1]{}
+\citation{phobert}
+\citation{bamibert}
+\HyPL@Entry{0<</S/D>>}
+\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{sec:intro}{{I}{1}{Introduction}{section.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{1}{section.2}\protected@file@percent }
+\newlabel{sec:related}{{II}{1}{Related Work}{section.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Detection of LLM-Generated Text}{1}{subsection.2.1}\protected@file@percent }
+\citation{guo2023hc3}
+\citation{gehrmann2019gltr}
+\citation{liu2019roberta}
+\citation{theocharopoulos}
+\citation{bert}
+\citation{krishna2023dipper}
+\citation{kirchenbauer2023watermark}
+\citation{sadasivan2023reliable}
+\citation{videtect}
+\citation{tran2022bartpho}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}Detection of Vietnamese Text}{2}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {III}Dataset and Method}{2}{section.3}\protected@file@percent }
+\newlabel{sec:method}{{III}{2}{Dataset and Method}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Data Collection}{2}{subsection.3.1}\protected@file@percent }
+\citation{phobert}
+\citation{bamibert}
+\citation{underthesea}
+\citation{kim2014}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Method overview. Each frozen encoder (PhoBERT or BamiBERT) uses its own tokenizer; only the deep learning classifier (CNN, BiLSTM, or their combination) is trained.}}{3}{figure.1}\protected@file@percent }
+\newlabel{fig:overview}{{1}{3}{Method overview. Each frozen encoder (PhoBERT or BamiBERT) uses its own tokenizer; only the deep learning classifier (CNN, BiLSTM, or their combination) is trained}{figure.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Dataset statistics.}}{3}{table.1}\protected@file@percent }
+\newlabel{tab:dataset}{{I}{3}{Dataset statistics}{table.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Preprocessing}{3}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Text Representation}{3}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Classification Models}{3}{subsection.3.4}\protected@file@percent }
+\citation{lstm}
+\citation{bilstm}
+\citation{adamw}
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Experimental Setup}{4}{section.4}\protected@file@percent }
+\newlabel{sec:setup}{{IV}{4}{Experimental Setup}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Data Split}{4}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Implementation Details}{4}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Evaluation Metrics}{4}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Results}{4}{section.5}\protected@file@percent }
+\newlabel{sec:results}{{V}{4}{Results}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Overall Performance}{4}{subsection.5.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Common training hyperparameters for the four models.}}{4}{table.2}\protected@file@percent }
+\newlabel{tab:hparams}{{II}{4}{Common training hyperparameters for the four models}{table.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Results of 5-fold cross-validation (\%, mean $\pm $ standard deviation). Best values in bold.}}{4}{table.3}\protected@file@percent }
+\newlabel{tab:main}{{III}{4}{Results of 5-fold cross-validation (\%, mean $\pm $ standard deviation). Best values in bold}{table.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Extension: Combined CNN and BiLSTM Head}{4}{subsection.5.2}\protected@file@percent }
+\newlabel{sec:ext}{{\mbox  {V-B}}{4}{Extension: Combined CNN and BiLSTM Head}{subsection.5.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Accuracy by text type (\%, mean $\pm $ standard deviation over 5 folds).}}{5}{table.4}\protected@file@percent }
+\newlabel{tab:bytype}{{IV}{5}{Accuracy by text type (\%, mean $\pm $ standard deviation over 5 folds)}{table.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Performance by Text Type}{5}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Error Analysis}{5}{subsection.5.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces AI probability distribution of BamiBERT + CNN by text type (out-of-fold predictions; y-axis on a logarithmic scale; dashed line: threshold of 0.5). The title of each panel indicates the error rate for that text type.}}{5}{figure.2}\protected@file@percent }
+\newlabel{fig:scores}{{2}{5}{AI probability distribution of BamiBERT + CNN by text type (out-of-fold predictions; y-axis on a logarithmic scale; dashed line: threshold of 0.5). The title of each panel indicates the error rate for that text type}{figure.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-E}}Computational Cost}{5}{subsection.5.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Number of texts where only BamiBERT is correct, only PhoBERT is correct, or both are incorrect, by text type (CNN head, out-of-fold predictions on 5,000 texts).}}{6}{figure.3}\protected@file@percent }
+\newlabel{fig:overlap}{{3}{6}{Number of texts where only BamiBERT is correct, only PhoBERT is correct, or both are incorrect, by text type (CNN head, out-of-fold predictions on 5,000 texts)}{figure.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Training and test time (seconds) per fold.}}{6}{table.5}\protected@file@percent }
+\newlabel{tab:time}{{V}{6}{Training and test time (seconds) per fold}{table.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-F}}Loss Curves}{6}{subsection.5.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Discussion}{6}{section.6}\protected@file@percent }
+\newlabel{sec:discussion}{{VI}{6}{Discussion}{section.6}{}}
+\citation{*}
+\bibcite{wu2025survey}{1}
+\bibcite{xiang_survey}{2}
+\bibcite{mitchell2023detectgpt}{3}
+\bibcite{guo2023hc3}{4}
+\bibcite{krishna2023dipper}{5}
+\bibcite{phobert}{6}
+\bibcite{bamibert}{7}
+\bibcite{theocharopoulos}{8}
+\bibcite{bert}{9}
+\bibcite{videtect}{10}
+\bibcite{underthesea}{11}
+\bibcite{kim2014}{12}
+\bibcite{lstm}{13}
+\bibcite{bilstm}{14}
+\bibcite{adamw}{15}
+\bibcite{kirchenbauer2023watermark}{16}
+\bibcite{gehrmann2019gltr}{17}
+\bibcite{liu2019roberta}{18}
+\bibcite{sadasivan2023reliable}{19}
+\bibcite{tran2022bartpho}{20}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Cross-entropy loss by epoch on the training, validation, and test sets (average of 5 folds; the shaded area represents $\pm $1 standard deviation across folds).}}{7}{figure.4}\protected@file@percent }
+\newlabel{fig:loss}{{4}{7}{Cross-entropy loss by epoch on the training, validation, and test sets (average of 5 folds; the shaded area represents $\pm $1 standard deviation across folds)}{figure.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Conclusion}{7}{section.7}\protected@file@percent }
+\newlabel{sec:conclusion}{{VII}{7}{Conclusion}{section.7}{}}
+\@writefile{toc}{\contentsline {section}{References}{7}{section*.1}\protected@file@percent }
+\gdef \@abspage@last{7}

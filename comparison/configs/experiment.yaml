@@ -3,25 +3,36 @@ seed: 42
 data_path: ../data/it_ai_human_data.csv   # relative to comparison/
 text_col: text
 n_folds: 5            # StratifiedGroupKFold: every sample is tested exactly once
-max_length: 256       # same token budget for both encoders (PhoBERT max = 256)
 num_classes: 2
 dropout: 0.1
+
+# Equal text for both encoders: every article is cut to its first N syllables before tokenization
+# (N chosen with scripts/choose_truncation.py: PhoBERT fits 99.6% of articles in 256 tokens).
+# null = no cut (each encoder reads as much as its max_length allows).
+truncate_syllables: 225
+run_name: equal_text   # results go to results/<mode>_<run_name>/, models to models/<mode>_<run_name>/
+
+# Token budget per encoder: large enough to read the whole N-syllable text
+max_length:
+  phobert: 256        # PhoBERT max = 256
+  bamibert: 512       # BamiBERT needs p99 = 358, max = 521 tokens for 225 syllables
 
 # frozen   : PhoBERT/BamiBERT only extract features (frozen), only the DL head is trained
 # finetune : train encoder + head end-to-end
 mode: frozen
 
-# epochs = max epochs; early stopping on val macro-F1 after `patience` epochs without improvement
+# epochs: trained in full when patience is null (no early stopping);
+# the weights of the epoch with the best val macro-F1 are kept either way
 frozen:
   batch_size: 32
-  epochs: 10
-  patience: 3
+  epochs: 30
+  patience: null
   lr_head: 1.0e-3
 
 finetune:
   batch_size: 16
-  epochs: 10
-  patience: 3
+  epochs: 30
+  patience: null
   lr_encoder: 2.0e-5
   lr_head: 1.0e-3
   warmup_ratio: 0.1
@@ -30,6 +41,15 @@ finetune:
 encoders:
   phobert: vinai/phobert-base
   bamibert: Qualcomm-AI-Research/BamiBERT
+
+# Extra head, NOT part of the 4-model comparison (run_all.py ignores it): CNN and BiLSTM branches
+# in parallel, features concatenated -> one classifier. Train with scripts/train_hybrid.py.
+hybrid_head:
+  cnn_bilstm:
+    num_filters: 128
+    kernel_sizes: [2, 3, 4]
+    lstm_hidden: 128
+    num_layers: 1
 
 # Choose CNN + BiLSTM as CLS
 heads:

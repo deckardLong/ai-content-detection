@@ -11,8 +11,12 @@ import numpy as np
 import pandas as pd
 from src.evaluation.significance import compare_all
 
+import yaml
+cfg = yaml.safe_load(open("configs/experiment.yaml", encoding="utf-8"))
 ap = argparse.ArgumentParser()
-ap.add_argument("--mode", default="frozen")
+ap.add_argument("--mode", "--run", dest="mode",
+                default=f"{cfg['mode']}_{cfg['run_name']}" if cfg.get("run_name") else cfg["mode"],
+                help="results/<run>/ (default: from config)")
 mode = ap.parse_args().mode
 
 parts = defaultdict(list)

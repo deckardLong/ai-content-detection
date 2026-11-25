@@ -1,0 +1,443 @@
+% Biên dịch bằng XeLaTeX (chạy 2 lần):  xelatex main.tex
+\documentclass[conference,a4paper]{IEEEtran}
+
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage{vietnamese}
+\setmainfont{texgyretermes}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold,
+                           ItalicFont=*-italic, BoldItalicFont=*-bolditalic]
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds,shapes.geometric}
+
+\AtBeginDocument{%
+  \renewcommand{\figurename}{Hình}%
+  \renewcommand{\tablename}{Bảng}%
+  \renewcommand{\abstractname}{Tóm tắt}%
+  \renewcommand{\IEEEkeywordsname}{Từ khóa}%
+  \renewcommand{\refname}{Tài liệu tham khảo}}
+
+% Chỗ cần tác giả bổ sung / kiểm tra lại
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+\newcommand{\pmv}[2]{#1\,{\scriptsize$\pm$#2}}
+
+\begin{document}
+
+\title{Phát hiện văn bản tiếng Việt do AI tạo sinh:\\
+So sánh có kiểm soát PhoBERT và BamiBERT\\ làm bộ trích xuất đặc trưng cho CNN và BiLSTM}
+
+\author{\IEEEauthorblockN{Nguyễn Hồ Giang Long}
+\IEEEauthorblockA{Khoa Công nghệ Thông tin\\
+Trường Đại học Mở Thành phố Hồ Chí Minh\\
+Thành phố Hồ Chí Minh, Việt Nam\\
+Email: 2351010115long@ou.edu.vn}}
+
+\maketitle
+
+% =====================================================================
+\begin{abstract}
+Sự phổ biến của các mô hình ngôn ngữ lớn (LLM) khiến việc phân biệt văn bản do người viết và văn bản do AI tạo ra ngày càng khó, đặc biệt khi AI chỉ viết lại một bài viết có sẵn của con người. Nghiên cứu này so sánh có kiểm soát hai mô hình tiền huấn luyện tiếng Việt, PhoBERT và BamiBERT, trong vai trò bộ trích xuất đặc trưng đóng băng, đi cùng hai mô hình phân loại CNN và BiLSTM. Tôi xây dựng bộ dữ liệu 5\,000 bài tin tức công nghệ thông tin gồm văn bản người viết, văn bản do LLM sinh ra và văn bản người viết được LLM viết lại. Để hai encoder đọc cùng một lượng nội dung, mọi văn bản được cắt về 225 âm tiết đầu trước khi đưa vào tokenizer riêng của từng mô hình. Qua đánh giá chéo 5-fold theo nhóm, BamiBERT + CNN đạt kết quả tốt nhất với Accuracy 95.42\% và F1 95.33\%. BamiBERT chỉ nhỉnh hơn PhoBERT khoảng 0.6 điểm Accuracy khi dùng CNN, nhỏ so với độ lệch chuẩn giữa các fold, trong khi CNN vượt BiLSTM khoảng 4 điểm với cả hai encoder. Toàn bộ ưu thế của BamiBERT tập trung ở nhóm văn bản được AI viết lại (87.52\% so với 84.56\%), với chi phí tính toán khoảng gấp đôi PhoBERT. Việc kết hợp song song CNN và BiLSTM không cải thiện so với CNN đơn (95.02\%).
+\end{abstract}
+
+\begin{IEEEkeywords}
+phát hiện văn bản do AI tạo sinh, tiếng Việt, PhoBERT, BamiBERT, CNN, BiLSTM, đặc trưng đóng băng
+\end{IEEEkeywords}
+
+% =====================================================================
+\section{Giới thiệu}
+\label{sec:intro}
+Các mô hình ngôn ngữ lớn (LLM) hiện có thể sinh ra văn bản trôi chảy, đúng ngữ pháp và mang văn phong gần với người viết. Điều này tuy mang lại nhiều tiện ích trong học tập, truyền thông và sản xuất nội dung, nhưng đồng thời cũng làm tăng nguy cơ tin tức không rõ nguồn gốc, đạo văn và thông tin sai lệch \cite{wu2025survey}. Vì vậy, các bộ phát hiện văn bản do AI tạo ra (AI-generated text detection) đang được quan tâm nghiên cứu \cite{wu2025survey,xiang_survey}.
+
+Với tiếng Việt, số nghiên cứu còn rất ít và chủ yếu dùng dữ liệu bài luận. Bên cạnh đó, một trường hợp thực tế nhưng khó hơn là văn bản do con người viết sau đó được LLM viết lại: nội dung vẫn là của người, chỉ có câu chữ thay đổi.
+
+Các nghiên cứu liên quan được trình bày chi tiết ở Mục~\ref{sec:related}; ở đây tôi chỉ tóm tắt. Theocharopoulos và cộng sự \cite{theocharopoulos} so sánh nhiều cách biểu diễn văn bản trên tóm tắt khoa học tiếng Anh và thấy BERT giữ trọng số cố định đạt kết quả thấp hơn nhiều so với khi fine-tune (accuracy 0.834 so với 0.987). Với tiếng Việt, Tran và cộng sự \cite{videtect} giới thiệu ViDetect, bộ dữ liệu bài luận học sinh với văn bản AI được tạo bằng cách viết lại, và đánh giá năm mô hình tiền huấn luyện, trong đó có PhoBERT.
+
+Đối với tiếng Việt, PhoBERT \cite{phobert} là mô hình tiền huấn luyện được sử dụng rộng rãi, nhưng yêu cầu văn bản phải được tách từ trước khi đưa vào mô hình. BamiBERT \cite{bamibert} là mô hình mới hơn, nhận trực tiếp văn bản thô và được nhóm tác giả báo cáo là vượt PhoBERT trên đa số các tác vụ đánh giá. Tuy nhiên, chưa rõ ưu thế này có còn khi áp dụng cho bài toán phát hiện văn bản do AI tạo ra hay không. Ngoài ra, khi so sánh hai mô hình có tokenizer khác nhau, việc cắt cùng một số token có thể khiến hai mô hình đọc lượng nội dung khác nhau, làm sai lệch kết quả so sánh.
+
+Mục đích của nghiên cứu này là đánh giá và so sánh hiệu quả của PhoBERT và BamiBERT, dùng làm bộ trích xuất đặc trưng đóng băng, cùng hai mô hình phân loại CNN và BiLSTM trong việc phát hiện văn bản tiếng Việt do AI tạo ra, trong điều kiện các mô hình dùng chung dữ liệu, nội dung đầu vào và quy trình huấn luyện. Các đóng góp chính gồm:
+\begin{itemize}
+  \item Bộ dữ liệu 5\,000 bài tin tức công nghệ thông tin tiếng Việt gồm ba loại: người viết, AI sinh ra và AI viết lại từ bài của người.
+  \item Một thiết lập so sánh có kiểm soát: hai encoder đóng băng đọc cùng 225 âm tiết đầu của mỗi bài, cùng mô hình phân loại, cùng cách chia dữ liệu theo nhóm và cùng siêu tham số.
+  \item Đánh giá bốn tổ hợp encoder--head bằng đánh giá chéo 5-fold, phân tích theo từng loại văn bản và chi phí tính toán.
+\end{itemize}
+
+% =====================================================================
+\section{Các nghiên cứu liên quan}
+\label{sec:related}
+
+\subsection{Các phương pháp phát hiện văn bản do LLM tạo ra}
+Phát hiện văn bản do LLM sinh ra thường được xem là bài toán phân loại nhị phân, trong đó mô hình gán nhãn người viết hoặc AI cho một văn bản đầu vào. Các phương pháp hiện nay chia thành hai nhóm \cite{wu2025survey}: nhóm \emph{chủ động} nhúng tín hiệu (watermark) vào văn bản ngay lúc sinh, và nhóm \emph{bị động} chỉ dựa vào nội dung và đặc trưng của văn bản. Nghiên cứu này thuộc nhóm bị động, trong đó có hai hướng chính là \emph{zero-shot}, không cần huấn luyện mô hình phân loại, và \emph{học có giám sát}, huấn luyện mô hình phân loại trên văn bản đã gán nhãn. Khảo sát \cite{xiang_survey} nhận xét rằng các bộ phát hiện có giám sát phụ thuộc nhiều vào dữ liệu gán nhãn và dễ giảm hiệu năng khi chuyển sang miền dữ liệu khác.
+
+\textbf{Zero-shot.} DetectGPT \cite{mitchell2023detectgpt} dựa trên giả thuyết rằng văn bản do một mô hình sinh ra nằm ở vùng có độ cong log-xác suất âm: khi thay đổi nhẹ văn bản đó, log-xác suất thường giảm, còn với văn bản người viết thì không. Phương pháp che 15\% số từ (theo đoạn hai từ), điền lại bằng mô hình T5 để tạo các bản nhiễu, rồi tính chênh lệch giữa log-xác suất của văn bản gốc và trung bình log-xác suất của các bản nhiễu (đã chuẩn hóa theo độ lệch chuẩn) và so với một ngưỡng; log-xác suất được tính bởi chính mô hình nguồn nên cần truy cập được mô hình này. Nhóm tác giả đánh giá trên tin tức XSum, bài viết học thuật SQuAD và truyện WritingPrompts, với văn bản do các mô hình từ GPT-2 (1.5 tỉ tham số) đến GPT-NeoX (20 tỉ tham số) sinh ra, và thêm GPT-3. Trên tin tức do GPT-NeoX sinh ra, AUROC tăng từ 0.81 của phương pháp zero-shot mạnh nhất lên 0.95, và DetectGPT tốt nhất ở 14 trong 15 tổ hợp dữ liệu và mô hình (tăng trung bình 0.06 AUROC). So với bộ phát hiện RoBERTa có giám sát, DetectGPT tương đương trên tin tức tiếng Anh nhưng bộ phát hiện có giám sát kém hơn trên văn bản khoa học và hỏng hẳn với tiếng Đức. Hạn chế của phương pháp là cần truy cập xác suất của mô hình nguồn và phải sinh, chấm điểm nhiều bản nhiễu cho mỗi văn bản, nên tốn tính toán. Hướng này không cần dữ liệu gán nhãn, khác với hướng học có giám sát mà nghiên cứu này dùng.
+
+\textbf{Học có giám sát với mô hình tiền huấn luyện.} Guo và cộng sự \cite{guo2023hc3} xây dựng HC3, tập so sánh câu trả lời của người và của ChatGPT cho cùng một câu hỏi. Phần tiếng Anh có 24\,322 câu hỏi, 58\,546 câu trả lời của người và 26\,903 câu trả lời của ChatGPT, lấy từ Reddit ELI5, WikiQA, Wikipedia, y học và tài chính; phần tiếng Trung có 12\,853 câu hỏi, 22\,259 câu trả lời của người và 17\,522 câu trả lời của ChatGPT. Họ so sánh hồi quy logistic trên đặc trưng GLTR với RoBERTa fine-tune, kiểm tra trên văn bản nguyên vẹn và trên từng câu riêng lẻ. Khi chuyển từ văn bản nguyên vẹn sang mức câu, F1 của RoBERTa chỉ giảm 1.5--2\% với tiếng Anh, trong khi GLTR giảm hơn 10\%, nên bộ phát hiện dựa trên mô hình tiền huấn luyện bền hơn đặc trưng thủ công.
+
+Theocharopoulos và cộng sự \cite{theocharopoulos} xây dựng tập dữ liệu từ 14\,331 bài báo trong kho CORD-19 (văn bản khoa học về COVID-19), mỗi bài có tiêu đề và tóm tắt tiếng Anh. Với mỗi tiêu đề, nhóm tác giả dùng GPT-3 (mô hình Davinci) sinh thêm một tóm tắt, nên tập cuối gồm 28\,662 mẫu, một nửa do người viết và một nửa do GPT-3 sinh ra, chia 80\%/20\% (22\,930 mẫu huấn luyện và 5\,732 mẫu kiểm thử, hai bản của cùng một tiêu đề nằm cùng một phía). Họ so sánh các cách biểu diễn văn bản kết hợp với mô hình học máy: TF-IDF với Logistic Regression, Naive Bayes và SVM; LSTM với Word2Vec; BERT \cite{bert} với trọng số giữ cố định (chỉ huấn luyện lớp kết nối đầy đủ thêm vào); BERT được fine-tune; và LSTM đặt trên đặc trưng BERT. Kết quả là trung bình 100 lần chạy độc lập, có dừng sớm theo loss validation. SVM và Logistic Regression trên TF-IDF đạt accuracy 0.980 và 0.975; BERT fine-tune và LSTM với Word2Vec cùng đạt 0.987; còn BERT giữ trọng số cố định chỉ đạt 0.834 và LSTM trên đặc trưng BERT chỉ đạt 0.697. Đây là công trình gần nhất với nghiên cứu của tôi vì có dùng đặc trưng của mô hình tiền huấn luyện ở chế độ đóng băng, kèm một mô hình phân loại đặt phía sau, và cho thấy hiệu năng phụ thuộc mạnh vào mô hình phân loại đó.
+
+\textbf{Độ bền với văn bản được viết lại.} Krishna và cộng sự \cite{krishna2023dipper} nghiên cứu độ bền của các bộ phát hiện trước văn bản đã được viết lại, đúng loại văn bản AI-Rewritten của tôi. Họ sinh văn bản 300 token bằng GPT2-XL, OPT-13B và text-davinci-003 theo hai tác vụ: viết tiếp từ hai câu mở đầu lấy từ WikiText-103 và trả lời câu hỏi dài. Họ huấn luyện DIPPER, mô hình viết lại 11 tỉ tham số (tinh chỉnh từ T5-XXL trên 6.3 triệu cặp diễn đạt lại), để viết lại các văn bản này rồi đo lại năm bộ phát hiện (watermark, DetectGPT, GPTZero, bộ phân loại của OpenAI và RankGen) với tỉ lệ dương tính giả 1\%. Việc viết lại làm độ chính xác giảm mạnh: watermark từ 100\% xuống 57.2\%, DetectGPT từ 70.3\% xuống 4.6\%, bộ phân loại của OpenAI từ 30.0\% xuống 15.6\% với GPT-3.5. Họ đề xuất phòng thủ bằng cách tìm kiếm trong kho 15 triệu văn bản đã sinh và phát hiện được 80.4\% đến 97.3\% văn bản viết lại, nhưng cách này đòi hỏi nhà cung cấp mô hình lưu kho văn bản.
+
+\subsection{Phát hiện văn bản tiếng Việt}
+Tran và cộng sự \cite{videtect} giới thiệu ViDetect, bộ dữ liệu đầu tiên cho phát hiện văn bản AI bằng tiếng Việt, gồm 6\,800 bài luận, trong đó 3\,400 bài do người viết. Các bài người viết là bài văn mẫu của học sinh các cấp, thu từ các trang giáo dục tiếng Việt, xuất bản trước năm 2021 và dài từ 256 từ trở lên; phần AI được tạo bằng cách để ChatGPT 3.5 và ChatGPT 4.0 viết lại các bài này, giữ nguyên ý chính. Dữ liệu chia theo tỉ lệ 7:1:2 cho huấn luyện, validation và kiểm thử. Nhóm tác giả fine-tune và đánh giá năm mô hình (ViT5, BARTpho, PhoBERT, mDeBERTa-v3 và mBERT) với đầu vào 64, 128 và 256 token, bằng Accuracy và F1. Accuracy trung bình của năm mô hình là 0.8580, 0.8721 và 0.8437 tương ứng với ba độ dài; PhoBERT-base đạt 0.8743, 0.8819 và 0.8708, còn kết quả tốt nhất của một mô hình là khoảng 0.90 (mDeBERTa-v3 với 64 token và mBERT với 128 token). Việc tăng độ dài đầu vào không làm mô hình tốt hơn. Công trình này khác nghiên cứu của tôi ở chỗ dùng bài luận học sinh, chỉ có văn bản AI viết lại, fine-tune toàn bộ mô hình và không có BamiBERT.
+
+% =====================================================================
+\section{Bộ dữ liệu và phương pháp}
+\label{sec:method}
+
+\begin{figure*}[t]
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[
+      font=\footnotesize,
+      >={Stealth[length=2mm]},
+      box/.style={draw, rounded corners=2pt, align=center, minimum height=9mm, inner sep=3pt, thick},
+      ds/.style={box, fill=yellow!18},
+      tok/.style={box, fill=blue!8, minimum width=27mm},
+      enc/.style={box, fill=gray!14, minimum width=22mm},
+      head/.style={box, fill=green!12, minimum width=31mm},
+      grp/.style={draw, dashed, rounded corners=4pt, inner sep=6pt},
+      lbl/.style={font=\footnotesize, inner sep=1pt, align=center, fill=white},
+      arr/.style={->, thick}]
+    % --- Bộ dữ liệu
+    \node[ds, minimum width=27mm] (dsn) at (1.35,-0.3) {\textbf{Bộ dữ liệu}\\5\,000 bài\\[1pt]{\scriptsize Human, AI-Generated,}\\{\scriptsize AI-Rewritten}};
+    % --- Tiền xử lý (các bước theo dòng)
+    \node[box, align=left, text width=34mm] (pre) at (5.5,-0.3) {\textbf{Tiền xử lý}\\[1pt]$\bullet$ Loại bỏ URL\\$\bullet$ Loại bỏ thẻ HTML\\$\bullet$ Chuẩn hóa khoảng trắng\\$\bullet$ \textbf{Cắt 225 âm tiết đầu}};
+    \draw[arr] (dsn) -- (pre);
+    % --- Tokenizer của từng encoder
+    \node[tok] (tkp) at (9.9,0.55)  {Tách từ (underthesea)\\\textbf{Tokenizer} PhoBERT\\$L=256$};
+    \node[tok] (tkb) at (9.9,-1.15) {Văn bản thô\\\textbf{Tokenizer} BamiBERT\\$L=512$};
+    \draw[arr] (pre.east) -- ++(0.25,0) |- (tkp.west);
+    \draw[arr] (pre.east) -- ++(0.25,0) |- (tkb.west);
+    % --- Encoder đóng băng
+    \node[enc] (pho) at (13.3,0.55)  {\textbf{PhoBERT}\\encoder};
+    \node[enc] (bam) at (13.3,-1.15) {\textbf{BamiBERT}\\encoder};
+    \begin{scope}[on background layer]
+      \node[grp, fill=gray!5, fit=(pho)(bam)] (encg) {};
+    \end{scope}
+    \node[lbl, anchor=south] at (encg.north) {Encoder \textbf{đóng băng}};
+    \draw[arr] (tkp) -- (pho);
+    \draw[arr] (tkb) -- (bam);
+    % --- Head huấn luyện
+    \node[head] (cnn) at (17.2,0.55)  {\textbf{CNN}\\$k\in\{2,3,4\}$, $F=128$};
+    \node[head] (lst) at (17.2,-1.15) {\textbf{BiLSTM}\\$h=128$};
+    \begin{scope}[on background layer]
+      \node[grp, fill=green!5, fit=(cnn)(lst)] (headg) {};
+    \end{scope}
+    \node[lbl, anchor=south] at (headg.north) {Head \textbf{huấn luyện}};
+    \draw[arr] (pho.east) -- (cnn.west);
+    \draw[arr] (pho.east) -- (lst.west);
+    \draw[arr] (bam.east) -- (cnn.west);
+    \draw[arr] (bam.east) -- (lst.west);
+    % --- Đầu ra
+    \node[box, fill=orange!10, minimum width=25mm] (out) at (17.2,-2.95) {Softmax\\Human / AI};
+    \draw[arr] (headg.south) -- (out.north);
+    % --- Đánh giá
+    \node[box, fill=violet!8, text width=105mm] (ev) at (6.8,-2.95) {\textbf{Đánh giá:} 5-fold phân tầng theo nhóm $\rightarrow$ Accuracy, Precision, Recall, F1 (lớp AI là lớp dương) cho 4 mô hình (2 encoder $\times$ 2 head)};
+    \draw[arr] (out.west) -- (ev.east);
+  \end{tikzpicture}}
+  \caption{Tổng quan phương pháp. Bộ dữ liệu gồm bài báo do người viết (Human), bài do LLM sinh theo chủ đề (AI-Generated) và bài người viết được LLM viết lại (AI-Rewritten). Văn bản được làm sạch, cắt về 225 âm tiết đầu, đi qua tokenizer riêng của từng encoder (PhoBERT cần tách từ trước, BamiBERT nhận văn bản thô), rồi vào encoder đóng băng (PhoBERT hoặc BamiBERT); chỉ head (CNN hoặc BiLSTM) được huấn luyện. Ghép mỗi encoder với mỗi head tạo thành bốn mô hình được so sánh.}
+  \label{fig:overview}
+\end{figure*}
+
+\subsection{Tổng quan}
+Hình~\ref{fig:overview} mô tả quy trình tổng thể. Phạm vi nghiên cứu là phân loại một văn bản tiếng Việt do người viết hay có sự tham gia của LLM. Bốn mô hình được so sánh là tổ hợp của hai encoder (PhoBERT, BamiBERT) và hai mô hình phân loại (CNN, BiLSTM). Các yếu tố còn lại gồm dữ liệu, cách chia tập, nội dung đầu vào, seed, bộ tối ưu và số epoch đều được giữ giống nhau, để khác biệt về kết quả chỉ đến từ encoder và mô hình phân loại.
+
+\subsection{Thu thập dữ liệu}
+Dữ liệu là các bài báo thuộc lĩnh vực công nghệ thông tin và thiết bị điện tử, thu thập từ sáu trang tin tiếng Việt: ICTnews (VietNamNet), Quản Trị Mạng, Thanh Niên, VnExpress, GenK và Tuổi Trẻ. Bộ dữ liệu có ba loại văn bản:
+\begin{itemize}
+  \item \textbf{Human}: bài báo gốc do người viết.
+  \item \textbf{AI-Generated}: bài báo do LLM sinh ra từ đầu, với câu lệnh (prompt) có chủ đề và yêu cầu văn phong giống người viết.
+  \item \textbf{AI-Rewritten}: bài báo gốc của người được LLM viết lại.
+\end{itemize}
+Văn bản AI được sinh và viết lại bằng hai LLM là Gemini (Google) và DeepSeek, sử dụng phiên bản miễn phí qua giao diện trò chuyện, vì phiên bản miễn phí có thể được nhà cung cấp thay đổi theo thời gian, tôi không xác định được chính xác phiên bản model tại thời điểm sinh dữ liệu. Hai loại AI được gán nhãn 1, loại Human được gán nhãn 0. Bộ dữ liệu cân bằng giữa hai lớp với 2\,500 bài người viết, 1\,250 bài AI sinh ra và 1\,250 bài AI viết lại (Bảng~\ref{tab:dataset}).
+
+Trong 2\,500 bài người viết, 2\,270 bài (90.8\%) xuất bản năm 2026, số còn lại rải rác từ 2010 đến 2025.
+
+\begin{table}[t]
+  \centering
+  \caption{Thống kê bộ dữ liệu.}
+  \label{tab:dataset}
+  \setlength{\tabcolsep}{8pt}
+  \begin{tabular}{lcc}
+    \toprule
+    Loại & Nhãn & Số mẫu \\
+    \midrule
+    Human & 0 & 2\,500 \\
+    AI    & 1 & 2\,500 \\
+    \quad AI-Generated &   & 1\,250 \\
+    \quad AI-Rewritten &   & 1\,250 \\
+    \midrule
+    Tổng  &   & 5\,000 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Tiền xử lý}
+Văn bản được làm sạch theo ba bước:
+\begin{itemize}\setlength\itemsep{0pt}\setlength\topsep{0pt}
+  \item loại bỏ URL;
+  \item loại bỏ thẻ HTML;
+  \item chuẩn hóa khoảng trắng (giữa các từ, đầu và cuối văn bản).
+\end{itemize}
+Tôi không loại bỏ dấu câu, ký tự đặc biệt hay biểu tượng như nhiều bài toán NLP khác, vì cách dùng các yếu tố này là tín hiệu quan trọng để phân biệt văn bản người viết và văn bản AI.
+
+\textbf{Cắt văn bản theo số âm tiết.} Hai encoder dùng hai tokenizer khác nhau, nên cùng một số token tương ứng với lượng nội dung khác nhau. Trong thử nghiệm ban đầu với cùng giới hạn 256 token, PhoBERT đọc được nhiều hơn khoảng 40\% nội dung so với BamiBERT, vì mỗi token của PhoBERT thường là một từ ghép trọn vẹn. Để loại bỏ yếu tố gây nhiễu này, mọi văn bản được cắt về \textbf{225 âm tiết đầu} trước khi tokenize, nên hai encoder luôn nhận cùng một đoạn văn. Giá trị 225 được chọn để gần như toàn bộ đầu vào của PhoBERT nằm trong giới hạn 256 token (99.58\% số bài). Với 225 âm tiết, BamiBERT cần tối đa 521 token (phân vị 99\% là 358), nên giới hạn 512 token của BamiBERT gần như không cắt thêm nội dung. Vì 98.3\% số bài dài ít nhất 225 âm tiết (100\% bài người viết, khoảng 96.6--96.7\% bài AI), bước cắt này cũng gần như loại bỏ chênh lệch độ dài giữa văn bản người viết và văn bản AI, tránh việc mô hình học theo độ dài thay vì văn phong.
+
+\subsection{Biểu diễn văn bản}
+Tôi dùng hai mô hình tiền huấn luyện tiếng Việt làm backbone: PhoBERT-base \cite{phobert} và BamiBERT \cite{bamibert}. Mỗi backbone gồm một tokenizer và một encoder tương ứng, và hai backbone khác nhau ở bước chuẩn bị đầu vào. PhoBERT được tiền huấn luyện trên văn bản đã tách từ, nên đầu vào được tách từ bằng thư viện underthesea \cite{underthesea} trước khi tokenize; các âm tiết của một từ được nối bằng dấu gạch dưới và xem như một đơn vị (ví dụ \emph{trí\_tuệ nhân\_tạo}). BamiBERT nhận văn bản thô và tokenize trực tiếp bằng từ vựng BPE của nó. Giới hạn độ dài là $L = 256$ token với PhoBERT và $L = 512$ token với BamiBERT.
+
+Với một chuỗi token độ dài $L$, encoder sinh ra chuỗi trạng thái ẩn ngữ cảnh ở lớp cuối $\mathbf{H} \in \mathbb{R}^{L \times d}$, với $d = 768$ là kích thước ẩn của cả hai encoder. Encoder được \textbf{đóng băng}: giữ ở chế độ đánh giá (không dropout) và không tính gradient, nên $\mathbf{H}$ của mỗi văn bản là cố định. Do đó $\mathbf{H}$ chỉ cần tính một lần cho toàn bộ dữ liệu và được lưu lại (định dạng fp16) để dùng chung cho cả hai mô hình phân loại và mọi fold.
+
+\subsection{Mô hình phân loại}
+Hai mô hình phân loại (head) cùng nhận $\mathbf{H}$ và mặt nạ $\mathbf{m} \in \{0,1\}^{L}$ đánh dấu token thật ($m_i = 1$) và token đệm ($m_i = 0$), rồi trả về phân phối xác suất trên hai lớp. Chúng chỉ khác nhau ở cách tổng hợp $\mathbf{H}$ thành vector có kích thước cố định $\mathbf{z}$. Head được khởi tạo ngẫu nhiên và là phần \emph{duy nhất} được huấn luyện. Các vị trí đệm không mang nội dung được loại khỏi phép tổng hợp.
+
+\textbf{CNN.} Theo Kim \cite{kim2014}, head CNN áp dụng tích chập một chiều dọc theo chuỗi để phát hiện các mẫu cục bộ kiểu n-gram. Trước tích chập, các vị trí đệm của $\mathbf{H}$ được gán bằng 0. Với mỗi kích thước kernel $k \in \{2, 3, 4\}$ có $F = 128$ bộ lọc; bộ lọc $j$ tạo ra chuỗi đặc trưng
+\begin{equation}
+  c^{(k,j)}_i = \mathrm{ReLU}\!\left(\mathbf{w}^{(k,j)} \cdot \mathbf{H}_{i:i+k-1} + b^{(k,j)}\right).
+\end{equation}
+Max-over-time pooling giữ giá trị lớn nhất trên các cửa sổ hợp lệ, tức là cửa sổ kết thúc tại token thật:
+\begin{equation}
+  \hat{c}^{(k,j)} = \max_{i} \; m_{i+k-1}\, c^{(k,j)}_i .
+\end{equation}
+Vì đầu ra ReLU không âm, nhân với mặt nạ (gán 0) tương đương với loại các vị trí đệm khỏi phép lấy max. Ghép các giá trị này cho $\mathbf{z} \in \mathbb{R}^{3F} = \mathbb{R}^{384}$.
+
+\textbf{BiLSTM.} Head BiLSTM \cite{lstm,bilstm} đọc $\mathbf{H}$ theo hai chiều để mỗi vị trí mang ngữ cảnh trước và sau. Chuỗi được đóng gói theo độ dài thật $T$ (packed sequence), nên các vị trí đệm bị bỏ qua hoàn toàn. Vector biểu diễn là ghép trạng thái ẩn cuối của hai chiều:
+\begin{equation}
+  \mathbf{z} = [\,\overrightarrow{\mathbf{h}}_T \,;\, \overleftarrow{\mathbf{h}}_1\,] \in \mathbb{R}^{2h},
+\end{equation}
+trong đó $\overrightarrow{\mathbf{h}}_T$ tổng hợp thông tin từ đầu đến cuối văn bản, $\overleftarrow{\mathbf{h}}_1$ tổng hợp từ cuối về đầu, và $h = 128$ là kích thước ẩn mỗi chiều (một lớp).
+
+\textbf{CNN $\|$ BiLSTM (mở rộng).} Để kiểm tra việc kết hợp hai mô hình phân loại có bổ trợ cho nhau hay không, tôi thêm một head thứ ba trên BamiBERT, gồm nhánh CNN và nhánh BiLSTM như trên chạy song song trên cùng $\mathbf{H}$. Hai vector đầu ra được nối thành $\mathbf{z} = [\mathbf{z}_{\mathrm{CNN}} ; \mathbf{z}_{\mathrm{BiLSTM}}] \in \mathbb{R}^{640}$ và huấn luyện chung bằng một hàm mất mát duy nhất. Head này không thuộc bốn tổ hợp chính và được đánh giá riêng.
+
+\textbf{Lớp đầu ra và hàm mất mát.} Với mọi head, $\mathbf{z}$ đi qua Dropout (tỉ lệ 0.1), một lớp tuyến tính và softmax:
+\begin{equation}
+  \hat{\mathbf{y}} = \mathrm{softmax}\!\left(\mathbf{W}\,\mathrm{Dropout}(\mathbf{z}) + \mathbf{b}\right) \in \mathbb{R}^{2}.
+\end{equation}
+Mô hình được huấn luyện bằng hàm mất mát cross-entropy trên $N$ mẫu:
+\begin{equation}
+  \mathcal{L} = -\frac{1}{N}\sum_{n=1}^{N}\sum_{c\in\{0,1\}} y_{n,c}\,\log \hat{y}_{n,c}.
+\end{equation}
+% =====================================================================
+\section{Thiết lập thực nghiệm}
+\label{sec:setup}
+
+\subsection{Chia dữ liệu}
+Tôi dùng đánh giá chéo 5-fold phân tầng theo nhóm (StratifiedGroupKFold). Mỗi bài AI-Rewritten được xếp cùng nhóm với bài gốc của nó (ghép theo URL), nên một cặp bài gốc--bài viết lại không bao giờ nằm ở cả tập huấn luyện và tập kiểm thử; việc phân tầng theo loại văn bản giữ tỉ lệ ba loại giữa các fold. Mỗi fold dùng 20\% dữ liệu làm tập kiểm thử; từ 80\% còn lại, một phần tương đương 10\% tổng dữ liệu (cũng chia theo nhóm) được tách làm tập validation, nên mỗi fold có tỉ lệ huấn luyện/validation/kiểm thử xấp xỉ 70/10/20. Mỗi mẫu xuất hiện trong tập kiểm thử đúng một lần, nên dự đoán out-of-fold phủ toàn bộ 5\,000 mẫu.
+
+\subsection{Chi tiết cài đặt}
+Bốn mô hình dùng chung siêu tham số huấn luyện (Bảng~\ref{tab:hparams}). Mô hình được huấn luyện đủ 30 epoch, không dừng sớm; sau mỗi epoch, macro-F1 trên tập validation được tính và trọng số của epoch có macro-F1 cao nhất được giữ lại để đánh giá trên tập kiểm thử. Thực nghiệm chạy trên GPU NVIDIA RTX 2070 (8\,GB) với PyTorch 2.7.1 (CUDA 11.8) và Hugging Face Transformers.
+
+\begin{table}[t]
+  \centering
+  \caption{Siêu tham số huấn luyện dùng chung cho bốn mô hình.}
+  \label{tab:hparams}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{ll}
+    \toprule
+    Siêu tham số & Giá trị \\
+    \midrule
+    Encoder & đóng băng \\
+    $S$ (số âm tiết đầu giữ lại) & 225 \\
+    $L$ (số token tối đa) & PhoBERT 256, BamiBERT 512 \\
+    $d$ (kích thước ẩn của encoder) & 768 \\
+    Bộ tối ưu & AdamW \cite{adamw} \\
+    $\eta$ (learning rate) & $10^{-3}$ \\
+    $\lambda$ (weight decay) & 0.01 \\
+    $B$ (batch size) & 32 \\
+    $E$ (số epoch) & 30, không dừng sớm \\
+    $\tau$ (ngưỡng cắt chuẩn gradient) & 1.0 \\
+    $p$ (tỉ lệ dropout) & 0.1 \\
+    $k$ (kích thước bộ lọc CNN) & 2, 3, 4 \\
+    $F$ (số bộ lọc CNN mỗi $k$) & 128 \\
+    $h$ (kích thước ẩn BiLSTM mỗi chiều) & 128 \\
+    Số lớp BiLSTM & 1 \\
+    Hàm mất mát & cross-entropy \\
+    Chọn epoch & macro-F1 validation cao nhất \\
+    $s$ (seed của fold $f$) & $42 + f$ \\
+    Độ chính xác số học & hỗn hợp (fp16) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Độ đo đánh giá}
+Lớp AI được xem là lớp dương. Tôi dùng Accuracy, Precision, Recall và F1 (trung bình điều hòa của Precision và Recall) của lớp dương. Các độ đo được tính trên tập kiểm thử của từng fold và báo cáo dưới dạng trung bình $\pm$ độ lệch chuẩn trên 5 fold. Tôi cũng báo cáo độ chính xác riêng trên từng loại văn bản và ROC-AUC.
+
+% =====================================================================
+\section{Kết quả}
+\label{sec:results}
+
+\subsection{Hiệu năng tổng thể}
+Bảng~\ref{tab:main} trình bày kết quả đánh giá chéo 5-fold. BamiBERT + CNN đạt kết quả cao nhất ở Accuracy (95.42\%), Recall (93.44\%) và F1 (95.33\%). PhoBERT + CNN theo sát với Accuracy 94.84\% và F1 94.69\%, và có Precision cao nhất (97.61\% so với 97.30\%). Độ lệch chuẩn của BamiBERT + CNN cũng nhỏ nhất (Accuracy $\pm 0.42$ so với $\pm 0.76$ của PhoBERT + CNN), cho thấy mô hình ổn định hơn khi thay đổi dữ liệu huấn luyện.
+
+\begin{table}[t]
+  \centering
+  \caption{Kết quả đánh giá chéo 5-fold (\%, trung bình $\pm$ độ lệch chuẩn). Giá trị tốt nhất in đậm.}
+  \label{tab:main}
+  \setlength{\tabcolsep}{0.8pt}
+  \begin{tabular}{lcccc}
+    \toprule
+    Mô hình & Accuracy & Precision & Recall & F1 \\
+    \midrule
+    PhoBERT + CNN     & \pmv{94.84}{0.76} & \pmv{\textbf{97.61}}{1.70} & \pmv{91.96}{1.11} & \pmv{94.69}{0.75} \\
+    PhoBERT + BiLSTM  & \pmv{90.60}{0.58} & \pmv{94.13}{1.59} & \pmv{86.64}{1.74} & \pmv{90.21}{0.64} \\
+    BamiBERT + CNN    & \pmv{\textbf{95.42}}{0.42} & \pmv{97.30}{0.98} & \pmv{\textbf{93.44}}{0.48} & \pmv{\textbf{95.33}}{0.40} \\
+    BamiBERT + BiLSTM & \pmv{91.30}{0.83} & \pmv{93.73}{1.44} & \pmv{88.56}{2.08} & \pmv{91.05}{0.93} \\
+    \midrule
+    {\scriptsize BamiBERT + CNN$\|$BiLSTM} & \pmv{95.02}{0.35} & \pmv{96.58}{1.07} & \pmv{93.36}{0.68} & \pmv{94.94}{0.33} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Ảnh hưởng của mô hình phân loại lớn hơn nhiều so với ảnh hưởng của encoder. Với cả hai encoder, CNN vượt BiLSTM khoảng 4 điểm phần trăm Accuracy (PhoBERT: 94.84\% so với 90.60\%; BamiBERT: 95.42\% so với 91.30\%). Ngược lại, khi giữ nguyên mô hình phân loại, việc thay PhoBERT bằng BamiBERT chỉ tăng Accuracy 0.58 điểm (CNN) và 0.70 điểm (BiLSTM). Mức tăng này nhỏ so với độ lệch chuẩn giữa các fold (0.42--0.83 điểm), nên chưa đủ để kết luận chắc chắn BamiBERT tốt hơn PhoBERT; ngược lại, chênh lệch khoảng 4 điểm giữa CNN và BiLSTM lớn hơn nhiều so với độ lệch chuẩn.
+
+Với head kết hợp CNN$\|$BiLSTM (dòng cuối của Bảng~\ref{tab:main}), tôi chạy cùng đánh giá chéo 5-fold trên đúng các fold và seed trên. Head này \emph{không} tốt hơn BamiBERT + CNN: Accuracy 95.02\% so với 95.42\%, chênh lệch thấp hơn 0.4 điểm và nằm trong độ lệch chuẩn giữa các fold. Nó vượt cả hai mô hình BiLSTM khoảng 4 điểm. Như vậy kết hợp hai head chỉ đưa mô hình lên mức của CNN đơn mà không vượt qua.
+
+
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=\textwidth]{fig_loss_cv.png}
+  \caption{Cross-entropy loss theo epoch trên tập huấn luyện, validation và kiểm thử (trung bình 5 fold; vùng mờ là $\pm 1$ độ lệch chuẩn giữa các fold).}
+  \label{fig:loss}
+\end{figure*}
+
+\subsection{Phân tích theo loại văn bản}
+Bảng~\ref{tab:bytype} tách độ chính xác theo ba loại văn bản. Nhóm AI-Generated gần như đã bão hòa (99.36\% với cả hai mô hình CNN), và nhóm Human có độ chính xác tương đương giữa hai encoder (97.72\% so với 97.40\% với CNN; PhoBERT nhỉnh hơn một chút, phù hợp với Precision cao hơn ở Bảng~\ref{tab:main}). Khoảng cách giữa hai encoder nằm gần như hoàn toàn ở nhóm \textbf{AI-Rewritten}, nhóm khó nhất: BamiBERT tăng 2.96 điểm với CNN (87.52\% so với 84.56\%) và 3.92 điểm với BiLSTM (79.20\% so với 75.28\%). Đây là nguồn gốc của Recall cao hơn ở BamiBERT. ROC-AUC của hai encoder gần như bằng nhau (98.94\% so với 98.87\% với CNN), nghĩa là khả năng xếp hạng văn bản AI cao hơn văn bản người là tương đương; khác biệt chủ yếu thể hiện ở độ chính xác tại ngưỡng quyết định 0.5.
+
+\begin{table}[t]
+  \centering
+  \caption{Độ chính xác theo loại văn bản và ROC-AUC (\%, trung bình $\pm$ độ lệch chuẩn trên 5 fold).}
+  \label{tab:bytype}
+  \setlength{\tabcolsep}{0.8pt}
+  \begin{tabular}{lcccc}
+    \toprule
+    Mô hình & Human & AI-Gen. & AI-Rewr. & ROC-AUC \\
+    \midrule
+    PhoBERT + CNN     & \pmv{\textbf{97.72}}{1.69} & \pmv{\textbf{99.36}}{0.61} & \pmv{84.56}{2.72} & \pmv{98.87}{0.15} \\
+    PhoBERT + BiLSTM  & \pmv{94.56}{1.62} & \pmv{98.00}{0.80} & \pmv{75.28}{3.46} & \pmv{96.57}{0.41} \\
+    BamiBERT + CNN    & \pmv{97.40}{0.97} & \pmv{\textbf{99.36}}{0.78} & \pmv{\textbf{87.52}}{1.31} & \pmv{\textbf{98.94}}{0.16} \\
+    BamiBERT + BiLSTM & \pmv{94.04}{1.54} & \pmv{97.92}{1.25} & \pmv{79.20}{3.14} & \pmv{96.89}{0.42} \\
+    \midrule
+    {\scriptsize BamiBERT + CNN$\|$BiLSTM} & \pmv{96.68}{1.08} & \pmv{99.28}{0.77} & \pmv{87.44}{1.28} & \pmv{98.84}{0.21} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Phân tích lỗi}
+Hình~\ref{fig:scores} vẽ phân bố xác suất AI mà BamiBERT + CNN gán cho từng loại văn bản (dự đoán out-of-fold, trục tung theo thang logarit, đường nét đứt là ngưỡng quyết định 0.5). Văn bản Human dồn về gần 0 và văn bản AI-Generated dồn về gần 1, nên mô hình rất ít sai ở hai loại này (65 và 8 văn bản). Văn bản AI-Rewritten có hai đỉnh: phần lớn gần 1, nhưng 109 trong 156 văn bản bị đoán sai có xác suất AI dưới 0.1, tức mô hình tin chắc đó là văn bản người viết. Nhìn chung, 137 trong 229 lỗi (59.8\%) có xác suất từ 0.9 trở lên ở phía sai, nên lỗi chủ yếu là lỗi tự tin chứ không phải các ca sát ngưỡng. Điều này phù hợp với việc loss validation tăng trong khi accuracy không giảm (mục đường cong mất mát) và cho thấy việc chỉnh ngưỡng quyết định khó khắc phục được các lỗi này.
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=0.9\textwidth]{fig_score_distribution.png}
+  \caption{Phân bố xác suất AI của BamiBERT + CNN theo loại văn bản (dự đoán out-of-fold; trục tung theo thang logarit; đường nét đứt: ngưỡng 0.5). Tiêu đề mỗi hình ghi tỉ lệ sai của loại đó.}
+  \label{fig:scores}
+\end{figure*}
+
+Hình~\ref{fig:overlap} đếm số văn bản mà chỉ một trong hai encoder đoán đúng khi dùng head CNN. Ưu thế của BamiBERT đến gần như hoàn toàn từ nhóm AI-Rewritten (57 văn bản chỉ BamiBERT đúng so với 20 văn bản chỉ PhoBERT đúng), trong khi ở nhóm Human BamiBERT kém nhẹ (31 so với 39) và ở nhóm AI-Generated hai encoder gần như không khác nhau (2 so với 2). Tổng cộng có 90 văn bản chỉ BamiBERT đúng và 61 văn bản chỉ PhoBERT đúng, tức hai encoder bất đồng trên rất ít mẫu (151 trên 5\,000). Ngoài ra, 136 trong 156 văn bản AI-Rewritten mà BamiBERT đoán sai cũng bị PhoBERT đoán sai, nên phần lớn lỗi là chung cho cả hai encoder; giới hạn có thể nằm ở bản thân loại văn bản này hơn là ở việc chọn encoder.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{fig_error_overlap.png}
+  \caption{Số văn bản mà chỉ BamiBERT đúng, chỉ PhoBERT đúng hoặc cả hai sai, theo loại văn bản (head CNN, dự đoán out-of-fold trên 5\,000 văn bản).}
+  \label{fig:overlap}
+\end{figure}
+\subsection{Chi phí tính toán}
+Bảng~\ref{tab:time} so sánh thời gian chạy. Vì encoder được đóng băng, đặc trưng của mỗi encoder chỉ trích một lần cho 5\,000 văn bản và dùng chung cho cả CNN, BiLSTM và mọi fold. BamiBERT chậm hơn PhoBERT khoảng 2.6 lần ở bước trích đặc trưng (104.97\,s so với 40.95\,s), 2.1 lần khi huấn luyện CNN và 1.5 lần khi huấn luyện BiLSTM. Nguyên nhân chính là với cùng 225 âm tiết, tokenizer của BamiBERT tạo chuỗi token dài hơn, làm tăng chi phí của cả encoder lẫn mô hình phân loại. Số epoch được chọn trung bình gần nhau (11--13), nên chênh lệch thời gian không do số epoch. Tóm lại, so với PhoBERT + CNN, BamiBERT + CNN tăng 0.58 điểm Accuracy và 1.48 điểm Recall nhưng tốn khoảng gấp đôi thời gian. Head kết hợp CNN$\|$BiLSTM trên BamiBERT mất khoảng 260--360\,s mỗi fold ở bốn fold đầu, tức nhiều hơn CNN (201.56\,s) và BiLSTM (206.25\,s); fold thứ năm mất 1\,093\,s do máy đang chạy tác vụ khác nên con số trung bình của nó không dùng để so sánh thời gian.
+
+\begin{table}[t]
+  \centering
+  \caption{Thời gian chạy (giây) trên RTX 2070. Trích đặc trưng: một lần cho mỗi encoder trên 5\,000 văn bản. Train và Test: trung bình mỗi fold. Epoch tốt nhất: epoch có macro-F1 validation cao nhất, trung bình của 5 fold (nên có phần thập phân).}
+  \label{tab:time}
+  \setlength{\tabcolsep}{2.5pt}
+  \resizebox{\columnwidth}{!}{%
+    \begin{tabular}{lcccc}
+    \toprule
+    Mô hình & Trích đặc trưng (s) & Train (s) & Test (s) & Epoch tốt nhất \\
+    \midrule
+    PhoBERT + CNN     & \multirow{2}{*}{40.95}  &  94.65 & 0.58 & 13.2 \\
+    PhoBERT + BiLSTM  &                         & 133.53 & 0.78 & 11.2 \\
+    BamiBERT + CNN    & \multirow{2}{*}{104.97} & 201.56 & 1.16 & 12.0 \\
+    BamiBERT + BiLSTM &                         & 206.25 & 1.29 & 13.4 \\
+    \bottomrule
+  \end{tabular}}
+\end{table}
+
+\subsection{Đường cong mất mát}
+Hình~\ref{fig:loss} vẽ cross-entropy loss theo epoch, trung bình trên 5 fold. Loss huấn luyện của cả bốn mô hình giảm về gần 0 sau khoảng 9--12 epoch. Loss trên tập validation và kiểm thử thì không giảm theo: với CNN, loss thấp nhất ở khoảng epoch 2--3 rồi tăng chậm và ổn định quanh 0.2; với BiLSTM, loss tăng liên tục từ khoảng 0.22 lên 0.45--0.55 và dao động giữa các fold lớn hơn. Hai encoder cho đường cong gần như trùng nhau khi dùng cùng mô hình phân loại, cho thấy hiện tượng quá khớp chủ yếu đến từ mô hình phân loại chứ không từ encoder. Đây là lý do tôi giữ trọng số của epoch có macro-F1 validation cao nhất thay vì epoch cuối. Tập kiểm thử trong hình chỉ dùng để quan sát, không tham gia chọn mô hình.
+
+
+
+% =====================================================================
+\section{Thảo luận}
+\label{sec:discussion}
+
+\textbf{BamiBERT so với PhoBERT.} Khi hai encoder đọc cùng nội dung, BamiBERT cho kết quả tốt hơn PhoBERT nhưng với biên độ nhỏ: khác biệt chỉ khoảng 0.6--0.7 điểm Accuracy, nhỏ so với độ lệch chuẩn giữa các fold (0.4--0.8 điểm), nên cần thêm dữ liệu hoặc nhiều lần chạy với seed khác nhau để khẳng định. Ưu thế của BamiBERT tập trung ở nhóm AI-Rewritten, là nhóm mà nội dung vẫn của người viết và chỉ có cách diễn đạt thay đổi. Một cách giải thích khả dĩ là BamiBERT biểu diễn văn bản thô ở mức subword, nên giữ được các chi tiết về cách chọn từ và dấu câu mà bước tách từ của PhoBERT có thể làm mất; tuy nhiên giả thuyết này cần được kiểm chứng thêm.
+\textbf{CNN so với BiLSTM.} CNN tốt hơn BiLSTM với cả hai encoder và có ít dấu hiệu quá khớp hơn. Vì trạng thái ẩn của encoder đã mang ngữ cảnh hai chiều, việc mô hình hóa tuần tự thêm bằng BiLSTM ít mang lại lợi ích, trong khi BiLSTM có nhiều tham số hơn và dễ quá khớp trên khoảng 3\,600 mẫu huấn luyện mỗi fold. Ngược lại, CNN với max-pooling chỉ cần phát hiện một vài mẫu cục bộ đặc trưng ở bất kỳ vị trí nào, phù hợp với tín hiệu phân biệt văn bản AI vốn thường thể hiện qua cụm từ và cách diễn đạt cục bộ.
+
+\textbf{Kết hợp CNN và BiLSTM.} Head kết hợp đạt 95.02\% Accuracy, tương đương CNN đơn (95.42\%, thấp hơn 0.4 điểm và nằm trong độ lệch chuẩn giữa các fold) và không cải thiện ở nhóm khó nhất (AI-Rewritten: 87.44\% so với 87.52\%). Một lần chia 70/15/15 ban đầu cho kết quả nhỉnh hơn CNN (95.04\% so với 94.39\% trên 766 mẫu), nhưng chênh lệch đó biến mất khi đánh giá chéo, cho thấy một lần chia dễ cho kết luận sai. Nhánh BiLSTM không bổ sung thông tin hữu ích cho CNN trên các đặc trưng đóng băng, và còn làm tăng chi phí huấn luyện.
+
+\textbf{Hạn chế.} Nghiên cứu có một số hạn chế. Thứ nhất, dữ liệu chỉ thuộc một miền (tin tức công nghệ thông tin) và văn bản AI chỉ đến từ hai LLM (Gemini và DeepSeek, phiên bản miễn phí), nên khả năng tổng quát hóa sang miền khác và sang các LLM khác như ChatGPT hay Claude chưa được đánh giá. Thứ hai, encoder chỉ được dùng ở dạng đóng băng; fine-tune toàn bộ có thể thay đổi thứ hạng. Thứ ba, siêu tham số được giữ chung nên chưa tối ưu riêng cho từng mô hình, và mỗi fold chỉ chạy một seed. Cuối cùng, mô hình chỉ đọc 225 âm tiết đầu của mỗi bài.
+
+% =====================================================================
+\section{Kết luận}
+\label{sec:conclusion}
+Bài báo trình bày một so sánh có kiểm soát giữa PhoBERT và BamiBERT trong vai trò bộ trích xuất đặc trưng đóng băng cho bài toán phát hiện văn bản tiếng Việt do AI tạo ra, đi cùng hai mô hình phân loại CNN và BiLSTM. Trên bộ dữ liệu 5\,000 bài tin tức công nghệ thông tin, với hai encoder cùng đọc 225 âm tiết đầu của mỗi bài, BamiBERT + CNN đạt kết quả tốt nhất (Accuracy 95.42\%, F1 95.33\%). BamiBERT nhỉnh hơn PhoBERT khoảng 0.6 điểm Accuracy khi dùng CNN, với ưu thế tập trung ở văn bản được AI viết lại, nhưng tốn khoảng gấp đôi chi phí tính toán. Lựa chọn mô hình phân loại ảnh hưởng đến kết quả nhiều hơn lựa chọn encoder: CNN vượt BiLSTM rõ rệt với cả hai encoder, còn việc kết hợp song song CNN và BiLSTM không cải thiện so với CNN đơn (95.02\% so với 95.42\%).
+
+Trong tương lai, tôi dự định fine-tune toàn bộ encoder, mở rộng dữ liệu sang nhiều miền và nhiều LLM khác nhau, đánh giá trên văn bản dài hơn 225 âm tiết, và phân tích các tín hiệu mà mô hình dùng để nhận diện văn bản được AI viết lại.
+
+% =====================================================================
+\begin{thebibliography}{99}
+
+\bibitem{wu2025survey}
+J.~Wu, S.~Yang, R.~Zhan, Y.~Yuan, L.~S. Chao, and D.~F. Wong, ``A survey on LLM-generated text detection: Necessity, methods, and future directions,'' \emph{Computational Linguistics}, vol.~51, no.~1, pp.~275--338, 2025.
+
+\bibitem{xiang_survey}
+L.~Xiang, N.~Li, Y.~Liu, and J.~Hu, ``AI-generated text detection: A comprehensive review of active and passive approaches,'' \emph{Computers, Materials \& Continua}, vol.~86, no.~3, 2026, doi: 10.32604/cmc.2025.073347.
+
+\bibitem{mitchell2023detectgpt}
+E.~Mitchell, Y.~Lee, A.~Khazatsky, C.~D. Manning, and C.~Finn, ``DetectGPT: Zero-shot machine-generated text detection using probability curvature,'' in \emph{Proc. Int. Conf. Machine Learning (ICML)}, 2023.
+
+\bibitem{guo2023hc3}
+B.~Guo, X.~Zhang, Z.~Wang, M.~Jiang, J.~Nie, Y.~Ding, J.~Yue, and Y.~Wu, ``How close is ChatGPT to human experts? Comparison corpus, evaluation, and detection,'' arXiv preprint arXiv:2301.07597, 2023.
+
+\bibitem{krishna2023dipper}
+K.~Krishna, Y.~Song, M.~Karpinska, J.~Wieting, and M.~Iyyer, ``Paraphrasing evades detectors of AI-generated text, but retrieval is an effective defense,'' in \emph{Advances in Neural Information Processing Systems (NeurIPS)}, vol.~36, 2023.
+\bibitem{phobert}
+D.~Q. Nguyen and A.~T. Nguyen, ``PhoBERT: Pre-trained language models for Vietnamese,'' in \emph{Findings of the Association for Computational Linguistics: EMNLP 2020}, 2020, pp.~1037--1042.
+
+\bibitem{bamibert}
+D.~Q. Nguyen, T.~Pham, C.~Tran, and L.~T. Nguyen, ``BamiBERT: A new BERT-based language model for Vietnamese,'' arXiv preprint arXiv:2607.02259, 2026.
+
+\bibitem{theocharopoulos}
+P.~C. Theocharopoulos, P.~Anagnostou, A.~Tsoukala, S.~V. Georgakopoulos, S.~K. Tasoulis, and V.~P. Plagianakos, ``Detection of fake generated scientific abstracts,'' in \emph{Proc. IEEE 9th Int. Conf. Big Data Computing Service and Applications (BigDataService)}, 2023, pp.~33--39, doi: 10.1109/BigDataService58306.2023.00011.
+
+\bibitem{bert}
+J.~Devlin, M.-W. Chang, K.~Lee, and K.~Toutanova, ``BERT: Pre-training of deep bidirectional transformers for language understanding,'' in \emph{Proc. NAACL-HLT}, 2019, pp.~4171--4186.
+
+\bibitem{videtect}
+Q.-D. Tran, V.-Q. Nguyen, Q.-H. Pham, K.~B.~T. Nguyen, and T.-H. Do, ``Vietnamese AI generated text detection,'' arXiv preprint arXiv:2405.03206, 2024.
+
+\bibitem{underthesea}
+Underthesea, ``Underthesea: Vietnamese NLP toolkit,'' GitHub repository, \url{https://github.com/undertheseanlp/underthesea}.
+
+\bibitem{kim2014}
+Y.~Kim, ``Convolutional neural networks for sentence classification,'' in \emph{Proc. EMNLP}, 2014, pp.~1746--1751.
+
+\bibitem{lstm}
+S.~Hochreiter and J.~Schmidhuber, ``Long short-term memory,'' \emph{Neural Computation}, vol.~9, no.~8, pp.~1735--1780, 1997.
+
+\bibitem{bilstm}
+M.~Schuster and K.~K. Paliwal, ``Bidirectional recurrent neural networks,'' \emph{IEEE Trans. Signal Processing}, vol.~45, no.~11, pp.~2673--2681, 1997.
+
+\bibitem{adamw}
+I.~Loshchilov and F.~Hutter, ``Decoupled weight decay regularization,'' in \emph{Proc. ICLR}, 2019.
+
+\end{thebibliography}
+
+\end{document}

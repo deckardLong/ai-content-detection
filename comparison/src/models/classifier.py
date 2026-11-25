@@ -4,8 +4,9 @@ import torch.nn as nn
 from .encoders import load_encoder
 from .heads.cnn_head import CNNHead
 from .heads.bilstm_head import BiLSTMHead
+from .heads.cnn_bilstm_head import CNNBiLSTMHead
 
-HEADS = {"cnn": CNNHead, "bilstm": BiLSTMHead}
+HEADS = {"cnn": CNNHead, "bilstm": BiLSTMHead, "cnn_bilstm": CNNBiLSTMHead}
 
 class EncoderClassifier(nn.Module):
     """Encoder (PhoBERT/BamiBERT) + DL head.

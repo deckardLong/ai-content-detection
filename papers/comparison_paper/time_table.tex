@@ -1,0 +1,17 @@
+\begin{table}[ht]
+\centering
+\caption{Thời gian huấn luyện và kiểm thử (giây). Đặc trưng của mỗi encoder được trích một lần và dùng chung cho cả CNN và BiLSTM}
+\label{tab:frozen_equal_text-cv-time}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lccccc}
+\hline
+Mô hình & Trích đặc trưng (s) & Train / fold (s) & Train 5 fold (s) & Test / fold (s) & Epoch tốt nhất (TB) \\
+\hline
+PhoBERT + CNN & 40.95 & 94.65 & 473.25 & 0.58 & 13.20 \\
+PhoBERT + BiLSTM & 40.95 & 133.53 & 667.64 & 0.78 & 11.20 \\
+BamiBERT + CNN & 104.97 & 201.56 & 1007.80 & 1.16 & 12.00 \\
+BamiBERT + BiLSTM & 104.97 & 206.25 & 1031.23 & 1.29 & 13.40 \\
+\hline
+\end{tabular}%
+}
+\end{table}

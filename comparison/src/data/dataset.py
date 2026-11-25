@@ -32,8 +32,16 @@ class FeatureDataset(Dataset):
         return len(self.labels)
 
     def __getitem__(self, idx):
-        return {
-            'hidden_states': torch.from_numpy(np.array(self.features[idx], dtype=np.float32)),
+        return self.__getitems__([idx])[0]
+
+    def __getitems__(self, indices):
+        # One sorted fancy-index read per batch is much faster on a memmap than one read per sample.
+        # Kept as fp16 here (half the copy cost); cast to fp32 on the GPU.
+        order = np.argsort(indices)
+        block = np.asarray(self.features[np.asarray(indices)[order]])
+        feats = torch.from_numpy(block)[torch.from_numpy(np.argsort(order))]
+        return [{
+            'hidden_states': feats[i],
             'attention_mask': self.attention_mask[idx],
             'labels': self.labels[idx],
-        }
+        } for i, idx in enumerate(indices)]

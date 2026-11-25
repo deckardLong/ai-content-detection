@@ -1,0 +1,17 @@
+\begin{table}[ht]
+\centering
+\caption{Độ chính xác theo loại văn bản và ROC-AUC (mean $\pm$ std trên 5 fold)}
+\label{tab:frozen_equal_text-bytype}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lcccc}
+\hline
+Mô hình & Human & AI-generated & AI-rewritten & ROC-AUC \\
+\hline
+PhoBERT + CNN & \textbf{0.9772} $\pm$ 0.0169 & \textbf{0.9936} $\pm$ 0.0061 & 0.8456 $\pm$ 0.0272 & 0.9887 $\pm$ 0.0015 \\
+PhoBERT + BiLSTM & 0.9456 $\pm$ 0.0162 & 0.9800 $\pm$ 0.0080 & 0.7528 $\pm$ 0.0346 & 0.9657 $\pm$ 0.0041 \\
+BamiBERT + CNN & 0.9740 $\pm$ 0.0097 & \textbf{0.9936} $\pm$ 0.0078 & \textbf{0.8752} $\pm$ 0.0131 & \textbf{0.9894} $\pm$ 0.0016 \\
+BamiBERT + BiLSTM & 0.9404 $\pm$ 0.0154 & 0.9792 $\pm$ 0.0125 & 0.7920 $\pm$ 0.0314 & 0.9689 $\pm$ 0.0042 \\
+\hline
+\end{tabular}%
+}
+\end{table}

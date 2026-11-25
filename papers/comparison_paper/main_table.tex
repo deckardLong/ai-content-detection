@@ -1,0 +1,17 @@
+\begin{table}[ht]
+\centering
+\caption{Kết quả 5-fold cross-validation trên 5000 mẫu (mean $\pm$ std), encoder đóng băng}
+\label{tab:frozen_equal_text-cv}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lcccc}
+\hline
+Mô hình & Accuracy & Precision & Recall & F1 \\
+\hline
+PhoBERT + CNN & 0.9484 $\pm$ 0.0076 & \textbf{0.9761} $\pm$ 0.0170 & 0.9196 $\pm$ 0.0111 & 0.9469 $\pm$ 0.0075 \\
+PhoBERT + BiLSTM & 0.9060 $\pm$ 0.0058 & 0.9413 $\pm$ 0.0159 & 0.8664 $\pm$ 0.0174 & 0.9021 $\pm$ 0.0064 \\
+BamiBERT + CNN & \textbf{0.9542} $\pm$ 0.0042 & 0.9730 $\pm$ 0.0098 & \textbf{0.9344} $\pm$ 0.0048 & \textbf{0.9533} $\pm$ 0.0040 \\
+BamiBERT + BiLSTM & 0.9130 $\pm$ 0.0083 & 0.9373 $\pm$ 0.0144 & 0.8856 $\pm$ 0.0208 & 0.9105 $\pm$ 0.0093 \\
+\hline
+\end{tabular}%
+}
+\end{table}

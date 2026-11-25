@@ -4,7 +4,7 @@ from tqdm.auto import tqdm
 def _forward(model, batch, device):
     mask = batch['attention_mask'].to(device)
     if 'hidden_states' in batch:
-        return model(mask, hidden_states=batch['hidden_states'].to(device))
+        return model(mask, hidden_states=batch['hidden_states'].to(device).float())
     return model(mask, input_ids=batch['input_ids'].to(device))
 
 def train_epoch(model, loader, optimizer, criterion, device, scaler, scheduler=None):
